@@ -14,6 +14,6 @@ class MyDataset(Dataset):
     
     def __getitem__(self, idx):
         # Convert to tensor 
-        embedding_tensor = torch.tensor(self.embeddings[idx], dtype=torch.float32)
+        embedding_tensor = torch.tensor(self.data[idx], dtype=torch.float32)
         label_tensor = torch.tensor(self.labels[idx], dtype=torch.long)  
         return embedding_tensor, label_tensor
