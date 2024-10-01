@@ -17,6 +17,10 @@ class Classifier(nn.Module):
         self.classifier = nn.Linear(hidden_size, num_labels)
 
     def forward(self, inputs):
+        
+        batch_size, _, _ = inputs.size()
+        inputs = inputs.view(batch_size, -1)  
+    
         # Apply dropout
         output = self.dropout(inputs)
         # Apply classifier (linear layer)
@@ -33,7 +37,7 @@ def calculate_metrics(predictions: np.ndarray, labels: np.ndarray):
         "f1": sklearn.metrics.f1_score(
             labels, predictions, average="macro", zero_division=0
         ),
-        "matthews_correlation": sklearn.metrics.matthews_corrcoef(
+        "matthews": sklearn.metrics.matthews_corrcoef(
             labels, predictions
         ),
         "precision": sklearn.metrics.precision_score(
@@ -56,6 +60,11 @@ def prepare_datasets(train_path, eval_path, embedding):
   elif embedding == 'w2v':
     x_train, y_train = onehot.process_csv(train_path)
     x_eval, y_eval = onehot.process_csv(eval_path)    
+
+  # print(f"x_train shape: {x_train.shape}")
+  # print(f"x_eval shape: {x_eval.shape}")
+
+  # print(f"type: {type(x_train)}")
 
   # Create torch DataSets
   train_dataset = dataset.MyDataset(x_train, y_train)
@@ -81,6 +90,9 @@ def train(model, dataloader, n_epochs, optimizer, loss_function):
         # Iterate through batches 
         for batch in dataloader:  
             inputs, labels = batch  # Get inputs and labels
+
+            # print(f"input shape {inputs.shape}")
+            # print(inputs)
 
             # Zero the gradients
             optimizer.zero_grad()
@@ -173,7 +185,7 @@ def main():
     train_path, eval_path, embedding, learning_rate, n_epochs, output_path = parse_arguments()
 
     # Parameters
-    hidden_size = 768  # Adjust this based on your W2V embedding size (must match DNABERT's hidden size)
+    hidden_size = 404  # Adjust this based on your W2V embedding size (must match DNABERT's hidden size)
     n_labels = 2     
     dropout_prob = 0.1  # Same dropout as in the original DNABERT classifier
 
@@ -181,26 +193,34 @@ def main():
     dataloader_train, dataloader_eval = prepare_datasets(train_path, eval_path, embedding)
     print('> dataset loaded')
 
+    
     # Initialize the model, optimizer, and loss function
     model = Classifier(hidden_size, n_labels, dropout_prob)
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     loss_function = nn.CrossEntropyLoss()   
     print('> model loaded')
 
-    model = train(model, dataloader_train, n_epochs, optimizer, loss_function)
-    print('> training complete')
 
-    # metrics = eval(model, dataloader_eval)
-    # print('> evaluation complete')
+    with open(f'{output_path}', "w") as file:
+      file.write(f"\tModel parameters:\n")
+      file.write(f"Training data: {train_path}\n")
+      file.write(f"Evaluation data: {eval_path}\n")
+      file.write(f"Embedding: {embedding}\n")
+      file.write(f"Learning rate: {learning_rate}")
+      file.write(f"Number of epochs: {n_epochs}\n\n")
 
-    # with open(f'{output_path}.out', "w") as file:
-    #     file.write(f"\tModel parameters:\n")
-    #     file.write(f"Training data: {train_path}")
-    #     file.write(f"Evaluation data: {eval_path}")
-    #     file.write(f"Embedding: {embedding}")
-    #     file.write(f"Learning rate: {learning_rate}")
-    #     file.write(f"Number of epochs: {n_epochs}\n")
-    #     file.write(metrics)
+      model = train(model, dataloader_train, n_epochs, optimizer, loss_function)
+      print('> training complete')
+
+      metrics = eval(model, dataloader_eval)
+      print('> evaluation complete')    
+
+      file.write('Metrics:')
+      file.write(f"Accuracy: {metrics['accuracy']}")
+      file.write(f"Precision: {metrics['precision']}")
+      file.write(f"Recall: {metrics['recall']}")
+      file.write(f"F1-score: {metrics['f1']}")
+      file.write(f"Matthew's correlation: {metrics['matthews']}")                   
  
 if __name__ == "__main__":
     main()
