@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import numpy as np
@@ -16,9 +17,14 @@ class Classifier(nn.Module):
         self.dropout = nn.Dropout(dropout_prob)
         self.classifier = nn.Linear(hidden_size, num_labels)
 
-    def forward(self, inputs):
+    def forward(self, inputs, embedding):
         
-        batch_size, _, _ = inputs.size()
+        if embedding == 'w2v':
+           
+            batch_size, _ = inputs.size()
+        elif embedding == 'onehot':
+            batch_size, _, _ = inputs.size()
+
         inputs = inputs.view(batch_size, -1)  
     
         # Apply dropout
@@ -58,8 +64,9 @@ def prepare_datasets(train_path, eval_path, embedding):
     x_eval, y_eval = onehot.process_csv(eval_path)
   # Apply word2vec
   elif embedding == 'w2v':
-    x_train, y_train = onehot.process_csv(train_path)
-    x_eval, y_eval = onehot.process_csv(eval_path)    
+    
+    x_train, y_train = w2v.process_csv(train_path)
+    x_eval, y_eval = w2v.process_csv(eval_path)    
 
   # print(f"x_train shape: {x_train.shape}")
   # print(f"x_eval shape: {x_eval.shape}")
@@ -77,7 +84,7 @@ def prepare_datasets(train_path, eval_path, embedding):
   return dataloader_train, dataloader_eval
 
 
-def train(model, dataloader, n_epochs, optimizer, loss_function):
+def train(model, dataloader, n_epochs, optimizer, loss_function, embedding):
 
     # Set the model to training mode
     model.train()  
@@ -98,7 +105,7 @@ def train(model, dataloader, n_epochs, optimizer, loss_function):
             optimizer.zero_grad()
 
             # Forward pass
-            logits = model.forward(inputs)
+            logits = model.forward(inputs, embedding)
 
             # Compute loss
             loss = loss_function(logits, labels)
@@ -185,35 +192,36 @@ def main():
     train_path, eval_path, embedding, learning_rate, n_epochs, output_path = parse_arguments()
 
     # Parameters
-    hidden_size = 404  # Adjust this based on your W2V embedding size (must match DNABERT's hidden size)
+    hidden_size = 404  
     n_labels = 2     
     dropout_prob = 0.1  # Same dropout as in the original DNABERT classifier
 
-    # Create dataloaders from inputs
-    dataloader_train, dataloader_eval = prepare_datasets(train_path, eval_path, embedding)
-    print('> dataset loaded')
+    output_path = f'{output_path}/{n_epochs}/{learning_rate}'
+    os.makedirs(output_path, exist_ok = True)
 
+    with open(f'{output_path}/log.out', "w") as file:
+      # Create dataloaders from inputs
+      dataloader_train, dataloader_eval = prepare_datasets(train_path, eval_path, embedding)
+      file.write('> datasets loaded\n')
     
-    # Initialize the model, optimizer, and loss function
-    model = Classifier(hidden_size, n_labels, dropout_prob)
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    loss_function = nn.CrossEntropyLoss()   
-    print('> model loaded')
+      # Initialize the model, optimizer, and loss function
+      model = Classifier(hidden_size, n_labels, dropout_prob)
+      optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+      loss_function = nn.CrossEntropyLoss()   
+      file.write('> model loaded\n\n')
 
-
-    with open(f'{output_path}', "w") as file:
-      file.write(f"\tModel parameters:\n")
+      file.write('\tModel parameters:\n')
       file.write(f"Training data: {train_path}\n")
       file.write(f"Evaluation data: {eval_path}\n")
       file.write(f"Embedding: {embedding}\n")
-      file.write(f"Learning rate: {learning_rate}")
+      file.write(f"Learning rate: {learning_rate}\n")
       file.write(f"Number of epochs: {n_epochs}\n\n")
 
-      model = train(model, dataloader_train, n_epochs, optimizer, loss_function)
-      print('> training complete')
+      model = train(model, dataloader_train, n_epochs, optimizer, loss_function, embedding)
+      file.write('> training complete\n')
 
       metrics = eval(model, dataloader_eval)
-      print('> evaluation complete')    
+      file.write('> evaluation complete\n\n')    
 
       file.write('Metrics:')
       file.write(f"Accuracy: {metrics['accuracy']}")

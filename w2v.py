@@ -34,7 +34,6 @@ def w2v(token_train, token_encode, vector_size, window, min_count, epochs):
                 
     return encoded_sequences
 
-  
 
 def tokenize(text, tokenizer, merges):
     pre_tokenize_result = tokenizer._tokenizer.pre_tokenizer.pre_tokenize_str(text)
@@ -117,27 +116,36 @@ def build_merges(corpus, vocab_size, tokenizer):
         merges[best_pair] = best_pair[0] + best_pair[1]
         vocab.append(best_pair[0] + best_pair[1])
 
-    return (merges, vocab)
+    return merges
 
 def bpe(train, vocab_size):
     tokenizer = AutoTokenizer.from_pretrained('gpt2')   
 
-    merges, vocab = build_merges(train, vocab_size, tokenizer)
+    merges = build_merges(train, vocab_size, tokenizer)
 
     tokens = [tokenize(seq, tokenizer, merges) for seq in train]
 
     return tokens
 
 # Função para ler o CSV e gerar os encodings
-def process_csv(train_file, encode_file):
-    # Lê o CSV ignorando a primeira linha
+def process_csv(encode_file):
+
+    train_file= '/mnt/NAS/stavisa/dataset/pretrain-dataset/train-200000.txt'
+    
+    # file = open(train_file, "r")
+    # x_train = file.read()
+    # # print(content)
+    # file.close()
+
+
     df_train = pd.read_csv(train_file)    
     df_encode = pd.read_csv(encode_file)    
 
-    x_train = df_train['sequence']
+    x_train = df_train.iloc[:, 0]
 
     x_encode = df_encode['sequence']
-    y_encode = df_encode['label']
+    labels = df_encode['label']
+    # labels = df_train['label']
 
     vocab_size = 50
     token_train = bpe(x_train, vocab_size)
@@ -150,10 +158,7 @@ def process_csv(train_file, encode_file):
 
     encoded_sequences = w2v(token_train, token_encode, vector_size, window, min_count, epochs)
 
-    for i in encoded_sequences:
-        print(len(i))
+    print(encoded_sequences.shape)
 
-    return encoded_sequences, y_encode
+    return encoded_sequences, labels
 
-
-process_csv('train.csv', 'encode.csv')
