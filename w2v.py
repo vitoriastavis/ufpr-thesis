@@ -130,7 +130,7 @@ def bpe(train, vocab_size):
 # Função para ler o CSV e gerar os encodings
 def process_csv(encode_file):
 
-    train_file= '/mnt/NAS/stavisa/dataset/pretrain-dataset/train-2.txt'
+    train_file= '/mnt/NAS/stavisa/dataset/pretrain-dataset/train-200000.txt'
     
     # file = open(train_file, "r")
     # x_train = file.read()
@@ -158,9 +158,6 @@ def process_csv(encode_file):
 
     encoded_sequences = w2v(token_train, token_encode, vector_size, window, min_count, epochs)
 
-    # print(encoded_sequences.shape)
-
-    # print(len(labels))
 
     return encoded_sequences, labels
 

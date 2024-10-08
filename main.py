@@ -184,7 +184,6 @@ def parse_arguments():
                        
     return (train_path, eval_path, embedding, learning_rate, n_epochs, output_path)
 
-
   
 def main():
     # Set up argument parsing
@@ -223,12 +222,12 @@ def main():
       metrics = eval(model, dataloader_eval)
       file.write('> evaluation complete\n\n')    
 
-      file.write('Metrics:')
-      file.write(f"Accuracy: {metrics['accuracy']}")
-      file.write(f"Precision: {metrics['precision']}")
-      file.write(f"Recall: {metrics['recall']}")
-      file.write(f"F1-score: {metrics['f1']}")
-      file.write(f"Matthew's correlation: {metrics['matthews']}")                   
+      file.write('\tMetrics:\n')
+      file.write(f"Accuracy: {metrics['accuracy']}\n")
+      file.write(f"Precision: {metrics['precision']}\n")
+      file.write(f"Recall: {metrics['recall']}\n")
+      file.write(f"F1-score: {metrics['f1']}\n")
+      file.write(f"Matthew's correlation: {metrics['matthews']}\n")                   
  
 if __name__ == "__main__":
     main()
