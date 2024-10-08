@@ -12,17 +12,18 @@ import argparse
 
 # Define the classifier (same as in BertForSequenceClassification)
 class Classifier(nn.Module):
-    def __init__(self, hidden_size, num_labels, dropout_prob):
+    def __init__(self, hidden_size, num_labels, dropout_prob, embedding):
         super(Classifier, self).__init__()
         self.dropout = nn.Dropout(dropout_prob)
         self.classifier = nn.Linear(hidden_size, num_labels)
+        self.embedding = embedding
 
-    def forward(self, inputs, embedding):
+    def forward(self, inputs):
         
-        if embedding == 'w2v':
+        if self.embedding == 'w2v':
            
             batch_size, _ = inputs.size()
-        elif embedding == 'onehot':
+        elif self.embedding == 'onehot':
             batch_size, _, _ = inputs.size()
 
         inputs = inputs.view(batch_size, -1)  
@@ -84,7 +85,7 @@ def prepare_datasets(train_path, eval_path, embedding):
   return dataloader_train, dataloader_eval
 
 
-def train(model, dataloader, n_epochs, optimizer, loss_function, embedding):
+def train(model, dataloader, n_epochs, optimizer, loss_function):
 
     # Set the model to training mode
     model.train()  
@@ -105,7 +106,7 @@ def train(model, dataloader, n_epochs, optimizer, loss_function, embedding):
             optimizer.zero_grad()
 
             # Forward pass
-            logits = model.forward(inputs, embedding)
+            logits = model.forward(inputs)
 
             # Compute loss
             loss = loss_function(logits, labels)
@@ -168,7 +169,6 @@ def parse_arguments():
 
     # Word2vec or One-hot encoding
     embedding = args.embedding
-
     if embedding != 'w2v' and embedding != 'onehot':
         raise TypeError("Error: --embedding must be 'w2v' or 'onehot'")
 
@@ -203,9 +203,9 @@ def main():
       # Create dataloaders from inputs
       dataloader_train, dataloader_eval = prepare_datasets(train_path, eval_path, embedding)
       file.write('> datasets loaded\n')
-    
+
       # Initialize the model, optimizer, and loss function
-      model = Classifier(hidden_size, n_labels, dropout_prob)
+      model = Classifier(hidden_size, n_labels, dropout_prob, embedding)
       optimizer = optim.Adam(model.parameters(), lr=learning_rate)
       loss_function = nn.CrossEntropyLoss()   
       file.write('> model loaded\n\n')
@@ -217,7 +217,7 @@ def main():
       file.write(f"Learning rate: {learning_rate}\n")
       file.write(f"Number of epochs: {n_epochs}\n\n")
 
-      model = train(model, dataloader_train, n_epochs, optimizer, loss_function, embedding)
+      model = train(model, dataloader_train, n_epochs, optimizer, loss_function)
       file.write('> training complete\n')
 
       metrics = eval(model, dataloader_eval)
