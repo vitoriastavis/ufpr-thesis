@@ -195,7 +195,7 @@ def main():
     n_labels = 2     
     dropout_prob = 0.1  # Same dropout as in the original DNABERT classifier
 
-    output_path = f'{output_path}/{n_epochs}/{learning_rate}'
+    # output_path = f'{output_path}/{n_epochs}/{learning_rate}'
     os.makedirs(output_path, exist_ok = True)
 
     with open(f'{output_path}/log.out', "w") as file:

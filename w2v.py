@@ -147,7 +147,7 @@ def process_csv(encode_file):
     labels = df_encode['label']
     # labels = df_train['label']
 
-    vocab_size = 50
+    vocab_size = 100
     token_train = bpe(x_train, vocab_size)
     token_encode = bpe(x_encode, vocab_size)
 
@@ -157,7 +157,6 @@ def process_csv(encode_file):
     epochs = 150
 
     encoded_sequences = w2v(token_train, token_encode, vector_size, window, min_count, epochs)
-
 
     return encoded_sequences, labels
 
