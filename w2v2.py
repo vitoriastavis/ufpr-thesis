@@ -10,12 +10,10 @@ from transformers import AutoTokenizer
 from collections import defaultdict
 
 # Aplica o word2vec nas sequencias 
-def w2v(token_train, token_encode, vector_size, window, min_count, epochs): 
+def w2v(model, token_encode, vector_size, window, min_count, epochs): 
 
     
-    model = Word2Vec(token_train, vector_size=vector_size,
-                    window=window, min_count=min_count, sg=1)
-    model.train(token_train, total_examples=len(token_train), epochs=epochs)
+    
 
     encoded_sequences = []
 
@@ -128,35 +126,36 @@ def bpe(train, vocab_size):
     return tokens
 
 # Função para ler o CSV e gerar os encodings
-def process_csv(encode_file):
+def process_csv(train_w2v, vocab_size, window_size, epochs, train_file, eval_file):
 
-    train_file= '/mnt/NAS/stavisa/dataset/pretrain-dataset/train-200000.txt'
-    
-    # file = open(train_file, "r")
-    # x_train = file.read()
-    # # print(content)
-    # file.close()
-
-
+    # Read files for w2v training, classifier training and classifier eval
+    df_w2v = pd.read_csv(train_w2v)    
     df_train = pd.read_csv(train_file)    
-    df_encode = pd.read_csv(encode_file)    
+    df_eval = pd.read_csv(eval_file) 
 
-    x_train = df_train.iloc[:, 0]
+    x_w2v = df_w2v.iloc[:, 0]
 
-    x_encode = df_encode['sequence']
-    labels = df_encode['label']
-    # labels = df_train['label']
+    x_train = df_train['sequence']
+    y_train = df_eval['label']
 
-    vocab_size = 4
+    x_eval = df_train['sequence']
+    y_eval = df_eval['label']
+    
+    # Create BPE tokens
+    token_w2v = bpe(x_w2v, vocab_size)
     token_train = bpe(x_train, vocab_size)
-    token_encode = bpe(x_encode, vocab_size)
+    token_eval = bpe(x_eval, vocab_size)
 
-    vector_size = 404
-    window = 20
     min_count = 1
-    epochs = 250
 
-    encoded_sequences = w2v(token_train, token_encode, vector_size, window, min_count, epochs)
+    # Train w2v
+    model = Word2Vec(token_train, vector_size=vector_size,
+                    window=window, min_count=min_count, sg=1)
+    model.train(token_train, total_examples=len(token_train), epochs=epochs)
 
-    return encoded_sequences, labels
+    # Apply encoding to train and eval
+    encoded_train = w2v(model, token_encode, vector_size, window, min_count, epochs)
+    encoded_eval = w2v(model, token_encode, vector_size, window, min_count, epochs)
+
+    return encoded_train, y_train, encoded_eval, y_eval
 

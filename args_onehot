@@ -1,0 +1,7 @@
+train_path=/mnt/NAS/stavisa/dataset/train.csv
+eval_path=/mnt/NAS/stavisa/dataset/test.csv
+learning_rate=0.003
+hidden_size=404
+n_epochs=3
+output_path=/mnt/NAS/stavisa/novo/onehot
+embedding=onehot
