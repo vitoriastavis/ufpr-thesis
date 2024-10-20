@@ -5,11 +5,13 @@ import torch.nn as nn
 import numpy as np
 import sklearn.metrics
 import torch.optim as optim
+from torch.utils.data import DataLoader
+import argparse
+
 import dataset
 import onehot
 import w2v2
-from torch.utils.data import DataLoader
-import argparse
+import dnabert1
 import dnabert2
 
 # Define the classifier (same as in BertForSequenceClassification)
@@ -59,26 +61,28 @@ def calculate_metrics(predictions: np.ndarray, labels: np.ndarray):
 
     return metrics
 
-def prepare_datasets(train_path, eval_path, embedding, args):
+def prepare_datasets(train_path, eval_path, embedding, embedding_args):
 
     # Apply one-hot encoding
     if embedding == 'onehot':
-        x_train, y_train = onehot.process_csv(train_path)
-        x_eval, y_eval = onehot.process_csv(eval_path)
+        x_train, y_train, x_eval, y_eval = onehot.process_csv(train_path, eval_path)
     # Apply word2vec
     elif embedding == 'w2v':    
-        x_train, y_train, x_eval, y_eval = w2v.process_csv(args['train_w2v'],
-                                                            args['vocab_size_w2v'],
-                                                            args['window_size_w2v'],
-                                                            args['epochs_w2v'],
-                                                            train_path,
-                                                            eval_path)
+        x_train, y_train, x_eval, y_eval = w2v.process_csv(train_path,
+                                                            eval_path,
+                                                            embedding_args['model_path']                                                        
+                                                            )
     elif embedding == 'dnabert1':
-        print('not yet')    
+        x_train, y_train, x_eval, y_eval = dnabert1.process_csv(train_path,
+                                                                eval_path,
+                                                                embedding_args['pooling'],
+                                                                embedding_args['model_path']                                        
+                                                                )  
     else:
-        x_train, y_train, x_eval, y_eval = dnabert2.process_csv(args['pooling_dnabert2'],
-                                                                train_path,
-                                                                eval_path)
+        x_train, y_train, x_eval, y_eval = dnabert2.process_csv(train_path,
+                                                                eval_path,
+                                                                embedding_args['pooling']
+                                                                )
 
     # Create torch datasets
     train_dataset = dataset.MyDataset(x_train, y_train)
@@ -154,52 +158,55 @@ def eval(model, dataloader):
 
   return metrics
 
-def parse_arguments(args_file):  
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="runs w2v or one-hot classification")    
+    parser.add_argument('-tp', '--train_path', type=str, help='Path to train data.csv or .txt')    
+    parser.add_argument('-ep', '--eval_path', type=str, help='Path to eval data.csv or .txt')    
+    parser.add_argument('-em', '--embedding', type=str, help="Embedding method: 'onehot', 'w2v', 'dnabert1' or 'dnabert2'")   
+    parser.add_argument('-lr', '--learning_rate', type=float, help='Learning rate for classifier')    
+    parser.add_argument('-ne', '--n_epochs', type=int, help='Number of epochs for classifier')
+    parser.add_argument('-hs', '--hidden_size', type=int, help='Hidden size for classifier layer')
+    parser.add_argument('-op', '--output_path', type=str, help='Output path for results')
+    parser.add_argument('-ea', '--embedding_args_path', type=str, help='File with arguments specific to each embedding method')
 
-    args = {}
+    args = parser.parse_args()   
 
-    with open(args_file, 'r') as f:
-        for line in f:
-            key, value = line.strip().split('=')
-            args[key] = value
+    # Path to inputs
+    train_path = args.train_path
+    eval_path = args.eval_path
 
-    train_path = args['train_path']    
-    eval_path = args['eval_path']
-    learning_rate = float(args['learning_rate'])
-    hidden_size = int(args['hidden_size'])
-    n_epochs = int(args['n_epochs'])
-    output_path = args['output_path']
-    embedding = args['embedding']
+    # Hyperparameters
+    learning_rate = args.learning_rate
+    n_epochs = args.n_epochs
+    hidden_size = args.hidden_size
+    
+    output_path = args.output_path
 
+    # Validate embedding method 
+    embedding = args.embedding
+    if embedding not in ['onehot', 'w2v', 'dnabert1', 'dnabert2']:
+        raise TypeError(f"embedding must be 'w2v', 'onehot', 'dnabert1', or 'dnabert2'")
+
+    # Get arguments for the embedding method 
     embedding_args = {}
-    try:
-        if embedding == 'w2v':
-            embedding_args['train_w2v'] = args['train_w2v']
-            embedding_args['vocab_size_w2v'] = args['vocab_size_w2v']
-            embedding_args['window_size_w2v'] = args['window_size_w2v']
-            embedding_args['epochs_w2v'] = args['epochs_w2v']
-        
-        elif embedding == 'onehot':
-            pass
-        
-        elif embedding == 'dnabert1':
-            # Adicione os argumentos relacionados ao 'dnabert1' se necessário
-            pass
-        
-        elif embedding == 'dnabert2':
-            pooling_dnabert2 = args['pooling_dnabert2']
-        
-        else:
-            raise TypeError(f"embedding must be 'w2v', 'onehot', 'dnabert1', or 'dnabert2'")
+    if args.embedding_args_path:
+        with open(args.embedding_args_path, 'r') as f:
+            try: 
+                for line in f:
+                    key, value = line.strip().split('=')
+                    embedding_args[key] = value
 
-    except KeyError as e:
-        print(f"Error: Missing argument '{e.args[0]}' in the input arguments file. Please check the args.txt file and the structure in the README.")
+            except KeyError as e:
+                print(f"Error: Missing argument '{e.embedding_args[0]}' in the input arguments file. Please check the args.txt file and the structure in the README.")
+                            
+
+    print('args done \n')
 
     return (train_path, eval_path, learning_rate, hidden_size, n_epochs, output_path, embedding, embedding_args)
-  
+
 def main():
     # Argument parsing 
-    train_path, eval_path, learning_rate, hidden_size, n_epochs, output_path, embedding, embedding_args = parse_arguments(sys.argv[1])
+    train_path, eval_path, learning_rate, hidden_size, n_epochs, output_path, embedding, embedding_args = parse_arguments()
 
     # Parameters
     n_labels = 2     
@@ -211,34 +218,35 @@ def main():
 
         # Create dataloaders from inputs
         dataloader_train, dataloader_eval = prepare_datasets(train_path, eval_path, embedding, embedding_args)
+
         file.write('> datasets loaded\n')
         file.write(f'Train: {train_path}\n')
         file.write(f'Eval: {eval_path}\n')
-        file.write(f'Embedding: {embedding}\n')
-        file.write(f'Embedding arguments: {embedding_args}\n\n')
+        file.write(f'Embedding: {embedding}\n\n')
+
+        if embedding != 'onehot':
+            file.write(f'Embedding arguments: {embedding_args}\n\n')
 
         # Initialize the model, optimizer, and loss function
         model = Classifier(hidden_size, n_labels, dropout_prob, embedding)
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-        loss_function = nn.CrossEntropyLoss()   
-        file.write('> model loaded\n\n')
+        loss_function = nn.CrossEntropyLoss()  
 
-        file.write('\tModel parameters:\n')
-        file.write(f"Training data: {train_path}\n")
-        file.write(f"Evaluation data: {eval_path}\n")
-        file.write(f"Embedding: {embedding}\n")
+        file.write('> model loaded\n')
         file.write(f"Learning rate: {learning_rate}\n")
-        file.write(f"Number of epochs: {n_epochs}\n\n")
+        file.write(f"Number of epochs: {n_epochs}\n")
+        file.write(f"Hidden size: {hidden_size}\n\n")
 
+        # Train the classifier
         model, first_loss, last_loss = train(model, dataloader_train, n_epochs, optimizer, loss_function)
         file.write('> training complete\n')
-        file.write(f"Epoch 0/{n_epochs}, loss = {first_loss}\n")
-        file.write(f"Epoch {n_epochs}/{n_epochs}, loss = {last_loss}\n\n")
+        file.write(f"Epoch 0/{n_epochs}, loss = {round(first_loss, 3)}\n")
+        file.write(f"Epoch {n_epochs}/{n_epochs}, loss = {round(last_loss, 3)}\n\n")
 
+        # Evaluation
         metrics = eval(model, dataloader_eval)
-        file.write('> evaluation complete\n\n')    
 
-        file.write('\tMetrics:\n')
+        file.write('> evaluation complete\n')
         file.write(f"Accuracy: {metrics['accuracy']}\n")
         file.write(f"Precision: {metrics['precision']}\n")
         file.write(f"Recall: {metrics['recall']}\n")

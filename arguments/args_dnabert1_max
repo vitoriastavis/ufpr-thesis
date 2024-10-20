@@ -1,0 +1,2 @@
+pooling=max
+model_path=/home/stavisa/models/dnabert1/finetuned-model

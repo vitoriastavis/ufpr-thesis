@@ -1,0 +1,12 @@
+> datasets loaded
+Train: train.csv
+Eval: encode.csv
+Embedding: dnabert1
+
+Embedding arguments: {'pooling': 'max', 'model_path': '/home/stavisa/models/dnabert1/finetuned-model'}
+
+> model loaded
+Learning rate: 0.02
+Number of epochs: 2
+Hidden size: 768
+

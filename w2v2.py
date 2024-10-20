@@ -1,5 +1,7 @@
 import nltk
 import urllib
+import sys
+import re
 import bs4 as bs
 import re
 from gensim.models import Word2Vec
@@ -8,12 +10,10 @@ import pandas as pd
 import numpy as np
 from transformers import AutoTokenizer
 from collections import defaultdict
+import argparse
 
 # Aplica o word2vec nas sequencias 
-def w2v(model, token_encode, vector_size, window, min_count, epochs): 
-
-    
-    
+def apply_w2v(model, token_encode, vector_length):  
 
     encoded_sequences = []
 
@@ -26,12 +26,26 @@ def w2v(model, token_encode, vector_size, window, min_count, epochs):
         if token_embeddings:
             encoded_sequences.append(np.mean(token_embeddings, axis=0))
         else:
-            encoded_sequences.append(np.zeros(vector_size))
+            encoded_sequences.append(np.zeros(vector_length))
    
     encoded_sequences = np.array(encoded_sequences)
                 
     return encoded_sequences
 
+
+def train_w2v(train_path, vocab_size, window_size, num_epochs, vector_length, save_path):
+    df_w2v = pd.read_csv(train_path)    
+    x_w2v = df_w2v.iloc[:, 0]
+    
+    # Create BPE tokens
+    token_w2v = bpe(x_w2v, vocab_size)
+
+    # Train w2v
+    model = Word2Vec(token_w2v, vector_size=vector_length,
+                    window=window_size, min_count=min_count, sg=1)
+    model.train(token_w2v, total_examples=len(token_w2v), epochs=num_epochs)
+
+    model.save(save_path)
 
 def tokenize(text, tokenizer, merges):
     pre_tokenize_result = tokenizer._tokenizer.pre_tokenizer.pre_tokenize_str(text)
@@ -76,7 +90,6 @@ def merge_pair(a, b, splits, word_freqs):
     return splits
 
 def build_merges(corpus, vocab_size, tokenizer):
-
 
     word_freqs = defaultdict(int)
 
@@ -126,14 +139,21 @@ def bpe(train, vocab_size):
     return tokens
 
 # Função para ler o CSV e gerar os encodings
-def process_csv(train_w2v, vocab_size, window_size, epochs, train_file, eval_file):
+def process_csv(train_file, eval_file, model_path):
 
-    # Read files for w2v training, classifier training and classifier eval
-    df_w2v = pd.read_csv(train_w2v)    
+    # Get the vocab size that matches the trained model
+    match = re.search(r"models/(\d+)_(\d+)_(\d+)_model", model_path)
+    if match:
+        vocab_size = int(match.group(1))  # Extract vocab_size
+    else:
+        raise ValueError("Invalid model path format. Ensure it follows the structure: models/{vocab_size}_{window_size}_{epoch}_model")
+
+    # Carregar o modelo treinado do caminho especificado
+    model = Word2Vec.load(model_path)
+
+    # Read files for training and eval
     df_train = pd.read_csv(train_file)    
     df_eval = pd.read_csv(eval_file) 
-
-    x_w2v = df_w2v.iloc[:, 0]
 
     x_train = df_train['sequence']
     y_train = df_eval['label']
@@ -142,20 +162,36 @@ def process_csv(train_w2v, vocab_size, window_size, epochs, train_file, eval_fil
     y_eval = df_eval['label']
     
     # Create BPE tokens
-    token_w2v = bpe(x_w2v, vocab_size)
     token_train = bpe(x_train, vocab_size)
     token_eval = bpe(x_eval, vocab_size)
 
-    min_count = 1
-
-    # Train w2v
-    model = Word2Vec(token_train, vector_size=vector_size,
-                    window=window, min_count=min_count, sg=1)
-    model.train(token_train, total_examples=len(token_train), epochs=epochs)
-
     # Apply encoding to train and eval
-    encoded_train = w2v(model, token_encode, vector_size, window, min_count, epochs)
-    encoded_eval = w2v(model, token_encode, vector_size, window, min_count, epochs)
+    encoded_train = apply_w2v(model, token_encode, vector_size)
+    encoded_eval = apply_w2v(model, token_encode, vector_size)
 
     return encoded_train, y_train, encoded_eval, y_eval
+
+def main():
+    # Argument parsing 
+    parser = argparse.ArgumentParser(description="trains or applies w2v")    
+    parser.add_argument('-tp', '--train_path', type=str, help='Path with text to train w2v')    
+    parser.add_argument('-vs', '--vocab_size', type=int, help='Size of vocabulary') 
+    parser.add_argument('-ws', '--window_size', type=int, help='Sliding window size') 
+    parser.add_argument('-ne', '--num_epochs', type=int, help='Number of epochs') 
+    parser.add_argument('-vl', '--vector_length', type=int, help='Length of the vector to represent each word') 
+    parser.add_argument('-op', '--save_path', type=str, help='Path with text to train w2v')    
+
+    args = parser.parse_args()   
+
+    train_path = args.train_path
+    vocab_size = args.vocab_size
+    window_size = args.window_size
+    num_epochs = args.num_epochs
+    vector_length = args.vector_length
+    save_path = args.save_path
+
+    train_w2v(train_path, vocab_size, window_size, num_epochs, vector_length, save_path)
+
+if __name__ == "__main__":
+    main()
 

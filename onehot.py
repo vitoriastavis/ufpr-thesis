@@ -14,14 +14,16 @@ def one_hot(sequence):
     return np.array([mapping[base] for base in sequence])
 
 # Função para ler o CSV e gerar os encodings
-def process_csv(file_path):
+def process_csv(train_path, eval_path):
     # Lê o CSV ignorando a primeira linha
-    df = pd.read_csv(file_path)    
-    
-    # Aplica o one-hot encoding nas sequências
-    encoded_sequences = np.array([one_hot(seq) for seq in df['sequence']])
+    df_train = pd.read_csv(train_path)    
+    df_eval = pd.read_csv(eval_path)    
 
-    # encoded_df = pd.DataFrame(encoded_sequences)
-    labels = df['label']
+    # Aplica o one-hot encoding nas sequências
+    encoded_train = np.array([one_hot(seq) for seq in df_train['sequence']])
+    encoded_eval = np.array([one_hot(seq) for seq in df_eval['sequence']])
+
+    y_train = df_train['label']
+    y_eval = df_eval['label']
     
-    return encoded_sequences, labels
+    return encoded_train, y_train, encoded_eval, y_eval
