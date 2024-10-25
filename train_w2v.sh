@@ -28,7 +28,7 @@ train_model() {
     START_TIME=$(date +%s)
 
     # Executa o script Python com os parâmetros
-    python ~/ufpr-thesis/w2v2.py -tp "$TRAIN_PATH" -vs "$vocab_size" -ws "$window_size" -ne "$num_epochs" -op "$save_path" -vl "$vector_length"
+    python ~/ufpr-thesis/w2v.py -tp "$TRAIN_PATH" -vs "$vocab_size" -ws "$window_size" -ne "$num_epochs" -op "$save_path" -vl "$vector_length"
 
     END_TIME=$(date +%s)
     DURATION=$((END_TIME - START_TIME))

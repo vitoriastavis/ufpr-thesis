@@ -10,7 +10,7 @@ import argparse
 
 import dataset
 import onehot
-import w2v2
+import w2v
 import dnabert1
 import dnabert2
 
@@ -161,9 +161,8 @@ def eval(model, dataloader):
 
   return metrics
 
-
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="runs w2v or one-hot classification")    
+    parser = argparse.ArgumentParser(description="runs classification based on onehot, w2v, dnabert1 or dnabert2 embeddings")    
     parser.add_argument('-tp', '--train_path', type=str, help='Path to train data .csv')    
     parser.add_argument('-ep', '--eval_path', type=str, help='Path to eval data .csv')    
     parser.add_argument('-op', '--output_path', type=str, help='Output path for results')
@@ -178,44 +177,106 @@ def parse_arguments():
     output_path = args.output_path
 
     return (train_path, eval_path, output_path)
+
+def run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, num_epochs, embedding_args):
+ 
+    # Parameters
+    n_labels = 2     
+    dropout_prob = 0.1  
+
+    os.makedirs(output_path, exist_ok = True)
+
+    with open(f'{output_path}/log.out', "w") as file:
+
+        # Create dataloaders from inputs
+        dataloader_train, dataloader_eval = prepare_datasets(train_path, eval_path, embedding, embedding_args)
+
+        file.write('> datasets loaded\n')
+        file.write(f'Train: {train_path}\n')
+        file.write(f'Eval: {eval_path}\n')
+        file.write(f'Embedding: {embedding}\n\n')
+
+        if embedding != 'onehot':
+            file.write(f'Embedding arguments: {embedding_args}\n\n')
+
+        # Initialize the model, optimizer, and loss function
+        model = Classifier(hidden_size, n_labels, dropout_prob, embedding)
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        loss_function = nn.CrossEntropyLoss()  
+
+        file.write('> model loaded\n')
+        file.write(f"Learning rate: {learning_rate}\n")
+        file.write(f"Number of epochs: {num_epochs}\n")
+        file.write(f"Hidden size: {hidden_size}\n\n")
+
+        # Train the classifier
+        model, first_loss, last_loss = train(model, dataloader_train, num_epochs, optimizer, loss_function)
+        file.write('> training complete\n')
+        file.write(f"Epoch 0/{num_epochs}, loss = {round(first_loss, 3)}\n")
+        file.write(f"Epoch {num_epochs}/{num_epochs}, loss = {round(last_loss, 3)}\n\n")
+
+        # Evaluation
+        metrics = eval(model, dataloader_eval)
+
+        file.write('> evaluation complete\n')
+        file.write(f"Accuracy: {metrics['accuracy']}\n")
+        file.write(f"Precision: {metrics['precision']}\n")
+        file.write(f"Recall: {metrics['recall']}\n")
+        file.write(f"F1-score: {metrics['f1']}\n")
+        file.write(f"Matthew's correlation: {metrics['matthews']}\n")                   
+
   
 def main():
-    train_path, eval_path, output_path = parse_arguments()
+    train_path, eval_path, results_path = parse_arguments()
 
     # testar hidden size como 404 pra todos
 
-    all_embeddings = ['onehot', 'w2v', 'dnabert1', 'dnabert2']
+    # all_embeddings = ['onehot', 'w2v', 'dnabert1', 'dnabert2']
+    all_embeddings = ['onehot', 'dnabert1', 'dnabert2']
 
-    learning_rates = [0.003, 0.03, 0.0003] 
-    num_epochs = [50, 150, 200]          
-    pooling_methods =  ['mean', 'max']
+    # learning_rates = [0.003, 0.03, 0.0003] 
+    # num_epochs = [50, 150, 200]          
+    # pooling_methods =  ['mean', 'max']
+    learning_rates = [0.003] 
+    num_epochs = [2]          
+    pooling_methods = ['mean']
+
     model_w2v = '/mnt/NAS/stavisa/w2v_real/models'
-    hidden_size = 404
 
-    for embedding in all_embeddings.keys:
+    # hidden_size = 404
+
+    for embedding in all_embeddings:
         count = 1
-        for lr in learning_rates:
+        for learning_rate in learning_rates:
             for epochs in num_epochs:
-                output_path = f'{output_path}/{embedding}/{count}'
-
-                if embedding == 'onehot':                        
+                output_path = f'{results_path}/{embedding}/{count}'
+                if embedding == 'onehot':     
+                    hidden_size = 404                   
                     embedding_args = {}
-                    run(embedding, train_path, eval_path, output_path, lr, hidden_size, epochs, embedding_args)
+                    run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
+                    print(f'terminei {embedding} {count}')
+                   
                     count += 1
-
                 elif embedding == 'w2v':
                     embedding_args = {'model_path':''}
                 elif embedding == 'dnabert1':
+                    hidden_size = 768
                     for pooling in pooling_methods:
                         embedding_args = {'pooling': pooling}   
-                        run(embedding, train_path, eval_path, output_path, lr, hidden_size, epochs, embedding_args)
+                        run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
                         count += 1
+                        print(f'terminei {embedding} {count}')
+
                 elif embedding == 'dnabert2':
+                    hidden_size = 768
+
                     for pooling in pooling_methods:
                         embedding_args = {'pooling': pooling}   
-                        run(embedding, train_path, eval_path, output_path, lr, hidden_size, epochs, embedding_args)
+                        run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
                         count += 1
-                
+                        print(f'terminei {embedding} {count}')
+
+
 if __name__ == "__main__":
     main()
 

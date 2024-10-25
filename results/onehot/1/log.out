@@ -1,0 +1,20 @@
+> datasets loaded
+Train: train.csv
+Eval: encode.csv
+Embedding: onehot
+
+> model loaded
+Learning rate: 0.003
+Number of epochs: 2
+Hidden size: 404
+
+> training complete
+Epoch 0/2, loss = 0.119
+Epoch 2/2, loss = 0.485
+
+> evaluation complete
+Accuracy: 0.7
+Precision: 0.5
+Recall: 0.35
+F1-score: 0.4117647058823529
+Matthew's correlation: 0.0

@@ -1,0 +1,22 @@
+> datasets loaded
+Train: train.csv
+Eval: encode.csv
+Embedding: dnabert1
+
+Embedding arguments: {'pooling': 'mean'}
+
+> model loaded
+Learning rate: 0.003
+Number of epochs: 2
+Hidden size: 768
+
+> training complete
+Epoch 0/2, loss = 0.13
+Epoch 2/2, loss = 1.127
+
+> evaluation complete
+Accuracy: 1.0
+Precision: 1.0
+Recall: 1.0
+F1-score: 1.0
+Matthew's correlation: 0.0
