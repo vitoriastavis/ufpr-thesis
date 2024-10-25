@@ -31,9 +31,9 @@ def process_csv(train_file, eval_file, pooling):
     df_eval = pd.read_csv(eval_file) 
 
     x_train = df_train['sequence']
-    y_train = df_eval['label']
+    y_train = df_train['label']
 
-    x_eval = df_train['sequence']
+    x_eval = df_eval['sequence']
     y_eval = df_eval['label'] 
 
     # Load tokenizer and model

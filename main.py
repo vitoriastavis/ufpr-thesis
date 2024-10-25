@@ -1,14 +1,18 @@
 import os
+import sys
 import torch
 import torch.nn as nn
 import numpy as np
 import sklearn.metrics
 import torch.optim as optim
-import dataset
-import onehot
-import w2v
 from torch.utils.data import DataLoader
 import argparse
+
+import dataset
+import onehot
+import w2v2
+import dnabert1
+import dnabert2
 
 # Define the classifier (same as in BertForSequenceClassification)
 class Classifier(nn.Module):
@@ -20,16 +24,18 @@ class Classifier(nn.Module):
 
     def forward(self, inputs):
         
-        if self.embedding == 'w2v':
-           
+        if self.embedding == 'w2v':           
             batch_size, _ = inputs.size()
         elif self.embedding == 'onehot':
             batch_size, _, _ = inputs.size()
-
+        elif self.embedding == 'dnabert1' or self.embedding == 'dnabert2':
+            batch_size = inputs.size()
+            
         inputs = inputs.view(batch_size, -1)  
     
         # Apply dropout
         output = self.dropout(inputs)
+
         # Apply classifier (linear layer)
         logits = self.classifier(output)
         
@@ -57,50 +63,56 @@ def calculate_metrics(predictions: np.ndarray, labels: np.ndarray):
 
     return metrics
 
-def prepare_datasets(train_path, eval_path, embedding):
+def prepare_datasets(train_path, eval_path, embedding, embedding_args):
 
-  # Apply one-hot encoding
-  if embedding == 'onehot':
-    x_train, y_train = onehot.process_csv(train_path)
-    x_eval, y_eval = onehot.process_csv(eval_path)
-  # Apply word2vec
-  elif embedding == 'w2v':
-    
-    x_train, y_train = w2v.process_csv(train_path)
-    x_eval, y_eval = w2v.process_csv(eval_path)    
+    # Apply one-hot encoding
+    if embedding == 'onehot':
+        x_train, y_train, x_eval, y_eval = onehot.process_csv(train_path, eval_path)
 
-  # print(f"x_train shape: {x_train.shape}")
-  # print(f"x_eval shape: {x_eval.shape}")
+    # Apply word2vec
+    elif embedding == 'w2v':    
+        x_train, y_train, x_eval, y_eval = w2v.process_csv(train_path,
+                                                            eval_path,
+                                                            embedding_args['model_path'] 
+                                                            )                                                       
+    # Apply dnabert1                                       
+    elif embedding == 'dnabert1':
+        x_train, y_train, x_eval, y_eval = dnabert1.process_csv(train_path,
+                                                                eval_path,
+                                                                embedding_args['pooling']
+                                                                )                                       
+    # Apply dnabert2                                                                  
+    else:
+        x_train, y_train, x_eval, y_eval = dnabert2.process_csv(train_path,
+                                                                eval_path,
+                                                                embedding_args['pooling']
+                                                                )
 
-  # print(f"type: {type(x_train)}")
+    # Create torch datasets
+    train_dataset = dataset.MyDataset(x_train, y_train)
+    eval_dataset = dataset.MyDataset(x_eval, y_eval)
 
-  # Create torch DataSets
-  train_dataset = dataset.MyDataset(x_train, y_train)
-  eval_dataset = dataset.MyDataset(x_eval, y_eval)
+    # Create DataLoader
+    dataloader_train = DataLoader(train_dataset, batch_size=8, shuffle=False, num_workers=4)
+    dataloader_eval = DataLoader(eval_dataset, batch_size=8, shuffle=False, num_workers=4)
 
-  # Create DataLoader
-  dataloader_train = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4)
-  dataloader_eval = DataLoader(eval_dataset, batch_size=8, shuffle=True, num_workers=4)
+    return dataloader_train, dataloader_eval
 
-  return dataloader_train, dataloader_eval
-
-
-def train(model, dataloader, n_epochs, optimizer, loss_function):
+def train(model, dataloader, num_epochs, optimizer, loss_function):
 
     # Set the model to training mode
     model.train()  
+    loss_list = []
 
     # Training loop
-    for epoch in range(n_epochs):
-
+    for epoch in range(num_epochs):
+        # print(epoch)
         total_loss = 0
-        
-        # Iterate through batches 
-        for batch in dataloader:  
-            inputs, labels = batch  # Get inputs and labels
 
-            # print(f"input shape {inputs.shape}")
-            # print(inputs)
+        # Iterate through batches 
+        for batch in dataloader: 
+
+            inputs, labels = batch  # Get inputs and labels
 
             # Zero the gradients
             optimizer.zero_grad()
@@ -109,18 +121,16 @@ def train(model, dataloader, n_epochs, optimizer, loss_function):
             logits = model.forward(inputs)
 
             # Compute loss
-            loss = loss_function(logits, labels)
+            loss = loss_function(logits, labels)            
 
             # Backward pass
             loss.backward()
             optimizer.step()
 
             total_loss += loss.item()
+            loss_list.append(total_loss / len(dataloader))
 
-        print(f"Epoch [{epoch + 1}/{n_epochs}], Loss: {total_loss / len(dataloader):.4f}")
-
-    return model
-
+    return model, loss_list[0], loss_list[-1]
 
 def eval(model, dataloader):
   all_predictions = []
@@ -151,15 +161,12 @@ def eval(model, dataloader):
 
   return metrics
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description="runs w2v or one-hot classification")    
-    parser.add_argument('-tp', '--train_path', type=str, help='Path to train data.csv or .txt')    
-    parser.add_argument('-ep', '--eval_path', type=str, help='Path to eval data.csv or .txt')    
-    parser.add_argument('-em', '--embedding', type=str, help='Embedding method: w2v or onehot')   
-    parser.add_argument('-lr', '--learning_rate', type=float, help='Learning rate', default=0.001)    
-    parser.add_argument('-ne', '--n_epochs', type=int, help='Number of epochs')
-    #parser.add_argument('-bs', '--batch_size', type=int, help='Batch size')
-    parser.add_argument('-op', '--output_path', type=str, help='Output path')
+    parser.add_argument('-tp', '--train_path', type=str, help='Path to train data .csv')    
+    parser.add_argument('-ep', '--eval_path', type=str, help='Path to eval data .csv')    
+    parser.add_argument('-op', '--output_path', type=str, help='Output path for results')
 
     args = parser.parse_args()   
 
@@ -167,68 +174,48 @@ def parse_arguments():
     train_path = args.train_path
     eval_path = args.eval_path
 
-    # Word2vec or One-hot encoding
-    embedding = args.embedding
-    if embedding != 'w2v' and embedding != 'onehot':
-        raise TypeError("Error: --embedding must be 'w2v' or 'onehot'")
-
-
-    ### testar caminhos ###
-
-    # Hyperparameters
-    learning_rate = args.learning_rate
-    n_epochs = args.n_epochs
-    # batch_size = args[batch_size]
-
+    # Results path    
     output_path = args.output_path
-                       
-    return (train_path, eval_path, embedding, learning_rate, n_epochs, output_path)
 
+    return (train_path, eval_path, output_path)
   
 def main():
-    # Set up argument parsing
- 
-    train_path, eval_path, embedding, learning_rate, n_epochs, output_path = parse_arguments()
+    train_path, eval_path, output_path = parse_arguments()
 
-    # Parameters
-    hidden_size = 404  
-    n_labels = 2     
-    dropout_prob = 0.1  # Same dropout as in the original DNABERT classifier
+    # testar hidden size como 404 pra todos
 
-    # output_path = f'{output_path}/{n_epochs}/{learning_rate}'
-    os.makedirs(output_path, exist_ok = True)
+    all_embeddings = ['onehot', 'w2v', 'dnabert1', 'dnabert2']
 
-    with open(f'{output_path}/log.out', "w") as file:
-      # Create dataloaders from inputs
-      dataloader_train, dataloader_eval = prepare_datasets(train_path, eval_path, embedding)
-      file.write('> datasets loaded\n')
+    learning_rates = [0.003, 0.03, 0.0003] 
+    num_epochs = [50, 150, 200]          
+    pooling_methods =  ['mean', 'max']
+    model_w2v = '/mnt/NAS/stavisa/w2v_real/models'
+    hidden_size = 404
 
-      # Initialize the model, optimizer, and loss function
-      model = Classifier(hidden_size, n_labels, dropout_prob, embedding)
-      optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-      loss_function = nn.CrossEntropyLoss()   
-      file.write('> model loaded\n\n')
+    for embedding in all_embeddings.keys:
+        count = 1
+        for lr in learning_rates:
+            for epochs in num_epochs:
+                output_path = f'{output_path}/{embedding}/{count}'
 
-      file.write('\tModel parameters:\n')
-      file.write(f"Training data: {train_path}\n")
-      file.write(f"Evaluation data: {eval_path}\n")
-      file.write(f"Embedding: {embedding}\n")
-      file.write(f"Learning rate: {learning_rate}\n")
-      file.write(f"Number of epochs: {n_epochs}\n\n")
+                if embedding == 'onehot':                        
+                    embedding_args = {}
+                    run(embedding, train_path, eval_path, output_path, lr, hidden_size, epochs, embedding_args)
+                    count += 1
 
-      model = train(model, dataloader_train, n_epochs, optimizer, loss_function)
-      file.write('> training complete\n')
-
-      metrics = eval(model, dataloader_eval)
-      file.write('> evaluation complete\n\n')    
-
-      file.write('\tMetrics:\n')
-      file.write(f"Accuracy: {metrics['accuracy']}\n")
-      file.write(f"Precision: {metrics['precision']}\n")
-      file.write(f"Recall: {metrics['recall']}\n")
-      file.write(f"F1-score: {metrics['f1']}\n")
-      file.write(f"Matthew's correlation: {metrics['matthews']}\n")                   
- 
+                elif embedding == 'w2v':
+                    embedding_args = {'model_path':''}
+                elif embedding == 'dnabert1':
+                    for pooling in pooling_methods:
+                        embedding_args = {'pooling': pooling}   
+                        run(embedding, train_path, eval_path, output_path, lr, hidden_size, epochs, embedding_args)
+                        count += 1
+                elif embedding == 'dnabert2':
+                    for pooling in pooling_methods:
+                        embedding_args = {'pooling': pooling}   
+                        run(embedding, train_path, eval_path, output_path, lr, hidden_size, epochs, embedding_args)
+                        count += 1
+                
 if __name__ == "__main__":
     main()
 

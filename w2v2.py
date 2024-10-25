@@ -40,6 +40,8 @@ def train_w2v(train_path, vocab_size, window_size, num_epochs, vector_length, sa
     # Create BPE tokens
     token_w2v = bpe(x_w2v, vocab_size)
 
+    min_count = 1
+
     # Train w2v
     model = Word2Vec(token_w2v, vector_size=vector_length,
                     window=window_size, min_count=min_count, sg=1)
@@ -156,9 +158,9 @@ def process_csv(train_file, eval_file, model_path):
     df_eval = pd.read_csv(eval_file) 
 
     x_train = df_train['sequence']
-    y_train = df_eval['label']
+    y_train = df_train['label']
 
-    x_eval = df_train['sequence']
+    x_eval = df_eval['sequence']
     y_eval = df_eval['label']
     
     # Create BPE tokens

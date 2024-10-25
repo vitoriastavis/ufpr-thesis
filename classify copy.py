@@ -24,16 +24,18 @@ class Classifier(nn.Module):
 
     def forward(self, inputs):
         
-        if self.embedding == 'w2v':
-           
+        if self.embedding == 'w2v':           
             batch_size, _ = inputs.size()
         elif self.embedding == 'onehot':
             batch_size, _, _ = inputs.size()
-
+        elif self.embedding == 'dnabert1' or self.embedding == 'dnabert2':
+            batch_size = inputs.size()
+            
         inputs = inputs.view(batch_size, -1)  
     
         # Apply dropout
         output = self.dropout(inputs)
+
         # Apply classifier (linear layer)
         logits = self.classifier(output)
         
@@ -66,18 +68,21 @@ def prepare_datasets(train_path, eval_path, embedding, embedding_args):
     # Apply one-hot encoding
     if embedding == 'onehot':
         x_train, y_train, x_eval, y_eval = onehot.process_csv(train_path, eval_path)
+
     # Apply word2vec
     elif embedding == 'w2v':    
         x_train, y_train, x_eval, y_eval = w2v.process_csv(train_path,
                                                             eval_path,
-                                                            embedding_args['model_path']                                                        
-                                                            )
+                                                            embedding_args['model_path'] 
+                                                            )                                                       
+    # Apply dnabert1                                       
     elif embedding == 'dnabert1':
         x_train, y_train, x_eval, y_eval = dnabert1.process_csv(train_path,
                                                                 eval_path,
                                                                 embedding_args['pooling'],
-                                                                embedding_args['model_path']                                        
-                                                                )  
+                                                                embedding_args['model_path'] 
+                                                                )                                       
+    # Apply dnabert2                                                                  
     else:
         x_train, y_train, x_eval, y_eval = dnabert2.process_csv(train_path,
                                                                 eval_path,
@@ -89,11 +94,10 @@ def prepare_datasets(train_path, eval_path, embedding, embedding_args):
     eval_dataset = dataset.MyDataset(x_eval, y_eval)
 
     # Create DataLoader
-    dataloader_train = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4)
-    dataloader_eval = DataLoader(eval_dataset, batch_size=8, shuffle=True, num_workers=4)
+    dataloader_train = DataLoader(train_dataset, batch_size=8, shuffle=False, num_workers=4)
+    dataloader_eval = DataLoader(eval_dataset, batch_size=8, shuffle=False, num_workers=4)
 
     return dataloader_train, dataloader_eval
-
 
 def train(model, dataloader, n_epochs, optimizer, loss_function):
 
@@ -103,11 +107,12 @@ def train(model, dataloader, n_epochs, optimizer, loss_function):
 
     # Training loop
     for epoch in range(n_epochs):
-
+        # print(epoch)
         total_loss = 0
-        
+
         # Iterate through batches 
-        for batch in dataloader:  
+        for batch in dataloader: 
+
             inputs, labels = batch  # Get inputs and labels
 
             # Zero the gradients
@@ -199,10 +204,54 @@ def parse_arguments():
             except KeyError as e:
                 print(f"Error: Missing argument '{e.embedding_args[0]}' in the input arguments file. Please check the args.txt file and the structure in the README.")
                             
-
-    print('args done \n')
-
     return (train_path, eval_path, learning_rate, hidden_size, n_epochs, output_path, embedding, embedding_args)
+
+def run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, n_epochs, embedding_args):
+
+    # Parameters
+    n_labels = 2     
+    dropout_prob = 0.1  # Same dropout as in the original DNABERT classifier
+
+    os.makedirs(output_path, exist_ok = True)
+
+    with open(f'{output_path}/log.out', "w") as file:
+
+        # Create dataloaders from inputs
+        dataloader_train, dataloader_eval = prepare_datasets(train_path, eval_path, embedding, embedding_args)
+
+        file.write('> datasets loaded\n')
+        file.write(f'Train: {train_path}\n')
+        file.write(f'Eval: {eval_path}\n')
+        file.write(f'Embedding: {embedding}\n\n')
+
+        if embedding != 'onehot':
+            file.write(f'Embedding arguments: {embedding_args}\n\n')
+
+        # Initialize the model, optimizer, and loss function
+        model = Classifier(hidden_size, n_labels, dropout_prob, embedding)
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        loss_function = nn.CrossEntropyLoss()  
+
+        file.write('> model loaded\n')
+        file.write(f"Learning rate: {learning_rate}\n")
+        file.write(f"Number of epochs: {n_epochs}\n")
+        file.write(f"Hidden size: {hidden_size}\n\n")
+
+        # Train the classifier
+        model, first_loss, last_loss = train(model, dataloader_train, n_epochs, optimizer, loss_function)
+        file.write('> training complete\n')
+        file.write(f"Epoch 0/{n_epochs}, loss = {round(first_loss, 3)}\n")
+        file.write(f"Epoch {n_epochs}/{n_epochs}, loss = {round(last_loss, 3)}\n\n")
+
+        # Evaluation
+        metrics = eval(model, dataloader_eval)
+
+        file.write('> evaluation complete\n')
+        file.write(f"Accuracy: {metrics['accuracy']}\n")
+        file.write(f"Precision: {metrics['precision']}\n")
+        file.write(f"Recall: {metrics['recall']}\n")
+        file.write(f"F1-score: {round(metrics['f1'], 3)}\n")
+        file.write(f"Matthew's correlation: {metrics['matthews']}\n")   
 
 def main():
     # Argument parsing 
@@ -250,7 +299,7 @@ def main():
         file.write(f"Accuracy: {metrics['accuracy']}\n")
         file.write(f"Precision: {metrics['precision']}\n")
         file.write(f"Recall: {metrics['recall']}\n")
-        file.write(f"F1-score: {metrics['f1']}\n")
+        file.write(f"F1-score: {round(metrics['f1'], 3)}\n")
         file.write(f"Matthew's correlation: {metrics['matthews']}\n")                   
 
 if __name__ == "__main__":
