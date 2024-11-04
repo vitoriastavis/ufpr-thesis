@@ -1,0 +1,1 @@
+Tempo para vocab_size=50, window_size=5, epochs=100, vector_length=50: 7675 segundos

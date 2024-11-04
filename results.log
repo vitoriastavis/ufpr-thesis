@@ -1,0 +1,28 @@
+nohup: ignoring input
+terminei onehot 1
+terminei onehot 2
+terminei onehot 3
+terminei onehot 4
+terminei onehot 5
+terminei onehot 6
+terminei onehot 7
+terminei onehot 8
+terminei onehot 9
+./w2v-models/50_10_100_50_model
+50 50
+Traceback (most recent call last):
+  File "/home/stavisa/ufpr-thesis/main.py", line 298, in <module>
+    main()
+  File "/home/stavisa/ufpr-thesis/main.py", line 272, in main
+    run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
+  File "/home/stavisa/ufpr-thesis/main.py", line 225, in run
+    model, first_loss, last_loss = train(model, dataloader_train, num_epochs, optimizer, loss_function)
+  File "/home/stavisa/ufpr-thesis/main.py", line 133, in train
+    logits = model.forward(inputs)
+  File "/home/stavisa/ufpr-thesis/main.py", line 46, in forward
+    logits = self.classifier(output)
+  File "/home/stavisa/programs/anaconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1194, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/stavisa/programs/anaconda3/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 114, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (8x50 and 404x2)

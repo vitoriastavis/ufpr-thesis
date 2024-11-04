@@ -11,8 +11,11 @@ import argparse
 import dataset
 import onehot
 import w2v
+import grover
 import dnabert1
 import dnabert2
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Define the classifier (same as in BertForSequenceClassification)
 class Classifier(nn.Module):
@@ -30,7 +33,10 @@ class Classifier(nn.Module):
             batch_size, _, _ = inputs.size()
         elif self.embedding == 'dnabert1' or self.embedding == 'dnabert2':
             batch_size = inputs.size()
-            
+        elif self.embedding == 'grover':
+            batch_size, _ = inputs.size()
+            #_, batch_size = inputs.size()
+
         inputs = inputs.view(batch_size, -1)  
     
         # Apply dropout
@@ -73,8 +79,13 @@ def prepare_datasets(train_path, eval_path, embedding, embedding_args):
     elif embedding == 'w2v':    
         x_train, y_train, x_eval, y_eval = w2v.process_csv(train_path,
                                                             eval_path,
-                                                            embedding_args['model_path'] 
-                                                            )                                                       
+                                                            embedding_args['model_path']
+                                                            ) 
+    # Apply grover                                       
+    elif embedding == 'grover':
+        x_train, y_train, x_eval, y_eval = grover.process_csv(train_path,
+                                                                eval_path,
+                                                                embedding_args['pooling'])                                                                                                                         
     # Apply dnabert1                                       
     elif embedding == 'dnabert1':
         x_train, y_train, x_eval, y_eval = dnabert1.process_csv(train_path,
@@ -112,7 +123,8 @@ def train(model, dataloader, num_epochs, optimizer, loss_function):
         # Iterate through batches 
         for batch in dataloader: 
 
-            inputs, labels = batch  # Get inputs and labels
+            # Get inputs and labels
+            inputs, labels = batch  
 
             # Zero the gradients
             optimizer.zero_grad()
@@ -128,7 +140,7 @@ def train(model, dataloader, num_epochs, optimizer, loss_function):
             optimizer.step()
 
             total_loss += loss.item()
-            loss_list.append(total_loss / len(dataloader))
+            loss_list.append(total_loss/len(dataloader))
 
     return model, loss_list[0], loss_list[-1]
 
@@ -222,45 +234,53 @@ def run(embedding, train_path, eval_path, output_path, learning_rate, hidden_siz
         file.write(f"Accuracy: {metrics['accuracy']}\n")
         file.write(f"Precision: {metrics['precision']}\n")
         file.write(f"Recall: {metrics['recall']}\n")
-        file.write(f"F1-score: {metrics['f1']}\n")
+        file.write(f"F1-score: {round(metrics['f1'],2)}\n")
         file.write(f"Matthew's correlation: {metrics['matthews']}\n")                   
 
   
 def main():
     train_path, eval_path, results_path = parse_arguments()
 
-    # testar hidden size como 404 pra todos
+    all_embeddings = ['onehot', 'w2v', 'grover', 'dnabert1', 'dnabert2']
 
-    # all_embeddings = ['onehot', 'w2v', 'dnabert1', 'dnabert2']
-    all_embeddings = ['onehot', 'dnabert1', 'dnabert2']
+    learning_rates = [0.003, 0.03, 0.0003] 
+    num_epochs = [50, 150, 200]          
+    pooling_methods =  ['mean', 'max']
 
-    # learning_rates = [0.003, 0.03, 0.0003] 
-    # num_epochs = [50, 150, 200]          
-    # pooling_methods =  ['mean', 'max']
-    learning_rates = [0.003] 
-    num_epochs = [2]          
-    pooling_methods = ['mean']
+    w2v_path = './w2v-models'
+    w2v_models = [os.path.join(w2v_path, f) for f in os.listdir(w2v_path) if os.path.isfile(os.path.join(w2v_path, f)) and f.endswith('_model')]
 
-    model_w2v = '/mnt/NAS/stavisa/w2v_real/models'
-
-    # hidden_size = 404
+    hidden_size = 768
 
     for embedding in all_embeddings:
         count = 1
         for learning_rate in learning_rates:
+
             for epochs in num_epochs:
                 output_path = f'{results_path}/{embedding}/{count}'
+
                 if embedding == 'onehot':     
                     hidden_size = 404                   
                     embedding_args = {}
                     run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
-                    print(f'terminei {embedding} {count}')
-                   
+                    print(f'terminei {embedding} {count}')                   
                     count += 1
-                elif embedding == 'w2v':
-                    embedding_args = {'model_path':''}
+
+                elif embedding == 'w2v':                      
+                    for model_path in w2v_models:
+                        embedding_args = {'model_path': model_path}
+                        run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
+                        print(f'terminei {embedding} {count}')
+                        count += 1
+
+                elif embedding == 'grover':
+                    for pooling in pooling_methods:
+                        embedding_args = {'pooling': pooling}   
+                        run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
+                        print(f'terminei {embedding} {count}')
+                        count += 1
+   
                 elif embedding == 'dnabert1':
-                    hidden_size = 768
                     for pooling in pooling_methods:
                         embedding_args = {'pooling': pooling}   
                         run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
@@ -268,14 +288,11 @@ def main():
                         print(f'terminei {embedding} {count}')
 
                 elif embedding == 'dnabert2':
-                    hidden_size = 768
-
                     for pooling in pooling_methods:
                         embedding_args = {'pooling': pooling}   
                         run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
                         count += 1
                         print(f'terminei {embedding} {count}')
-
 
 if __name__ == "__main__":
     main()

@@ -4,17 +4,17 @@ Eval: /mnt/NAS/stavisa/dataset/test.csv
 Embedding: onehot
 
 > model loaded
-Learning rate: 0.003
+Learning rate: 0.03
 Number of epochs: 50
 Hidden size: 404
 
 > training complete
 Epoch 0/50, loss = 0.0
-Epoch 50/50, loss = 0.75
+Epoch 50/50, loss = 1.627
 
 > evaluation complete
-Accuracy: 0.4978
-Precision: 0.4963337625275335
-Recall: 0.49779999999999996
-F1-score: 0.44
-Matthew's correlation: -0.005680043112310478
+Accuracy: 0.5152
+Precision: 0.5153230156210886
+Recall: 0.5152
+F1-score: 0.51
+Matthew's correlation: 0.030522767727750165

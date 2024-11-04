@@ -1,0 +1,12 @@
+> datasets loaded
+Train: /mnt/NAS/stavisa/dataset/train.csv
+Eval: /mnt/NAS/stavisa/dataset/test.csv
+Embedding: w2v
+
+Embedding arguments: {'model_path': './w2v-models/50_10_100_50_model'}
+
+> model loaded
+Learning rate: 0.003
+Number of epochs: 50
+Hidden size: 404
+
