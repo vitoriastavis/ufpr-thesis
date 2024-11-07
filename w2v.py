@@ -144,14 +144,12 @@ def bpe(train, vocab_size):
 # Função para ler o CSV e gerar os encodings
 def process_csv(train_file, eval_file, model_path):
 
-    print(model_path)
-
     # Get the vocab size that matches the trained model
     match = re.search(r"(\d+)_(\d+)_(\d+)_(\d+)_model", model_path)
     if match:
         vocab_size = int(match.group(1))  # Extract vocab_size
         vector_length = int(match.group(4))
-        print(vocab_size, vector_length)
+        # print(vocab_size, vector_length)
     else:
         raise ValueError("Invalid model path format. Ensure it follows the structure: models/{vocab_size}_{window_size}_{epoch}_model")
 

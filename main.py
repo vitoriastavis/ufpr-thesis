@@ -117,7 +117,6 @@ def train(model, dataloader, num_epochs, optimizer, loss_function):
 
     # Training loop
     for epoch in range(num_epochs):
-        # print(epoch)
         total_loss = 0
 
         # Iterate through batches 
@@ -242,39 +241,40 @@ def main():
     train_path, eval_path, results_path = parse_arguments()
 
     all_embeddings = ['onehot', 'w2v', 'grover', 'dnabert1', 'dnabert2']
-
-    learning_rates = [0.003, 0.03, 0.0003] 
-    num_epochs = [50, 150, 200]          
+    learning_rates = [0.003, 0.0003] 
+    num_epochs = [20, 100]          
     pooling_methods =  ['mean', 'max']
 
     w2v_path = './w2v-models'
     w2v_models = [os.path.join(w2v_path, f) for f in os.listdir(w2v_path) if os.path.isfile(os.path.join(w2v_path, f)) and f.endswith('_model')]
-
-    hidden_size = 768
-
+    
     for embedding in all_embeddings:
         count = 1
         for learning_rate in learning_rates:
 
             for epochs in num_epochs:
-                output_path = f'{results_path}/{embedding}/{count}'
-
-                if embedding == 'onehot':     
+                
+                if embedding == 'onehot':  
+                    output_path = f'{results_path}/{embedding}/{count}'
                     hidden_size = 404                   
                     embedding_args = {}
                     run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
                     print(f'terminei {embedding} {count}')                   
                     count += 1
 
-                elif embedding == 'w2v':                      
+                elif embedding == 'w2v':  
+                    hidden_size = 250                     
                     for model_path in w2v_models:
+                        output_path = f'{results_path}/{embedding}/{count}'
                         embedding_args = {'model_path': model_path}
                         run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
                         print(f'terminei {embedding} {count}')
                         count += 1
 
                 elif embedding == 'grover':
+                    hidden_size = 768
                     for pooling in pooling_methods:
+                        output_path = f'{results_path}/{embedding}/{count}'
                         embedding_args = {'pooling': pooling}   
                         run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
                         print(f'terminei {embedding} {count}')
@@ -282,17 +282,19 @@ def main():
    
                 elif embedding == 'dnabert1':
                     for pooling in pooling_methods:
+                        output_path = f'{results_path}/{embedding}/{count}'
                         embedding_args = {'pooling': pooling}   
                         run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
-                        count += 1
                         print(f'terminei {embedding} {count}')
+                        count += 1
 
                 elif embedding == 'dnabert2':
                     for pooling in pooling_methods:
+                        output_path = f'{results_path}/{embedding}/{count}'
                         embedding_args = {'pooling': pooling}   
                         run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
-                        count += 1
                         print(f'terminei {embedding} {count}')
+                        count += 1
 
 if __name__ == "__main__":
     main()
