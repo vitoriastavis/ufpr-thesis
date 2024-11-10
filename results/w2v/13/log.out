@@ -1,0 +1,22 @@
+> datasets loaded
+Train: /mnt/NAS/stavisa/dataset/train.csv
+Eval: /mnt/NAS/stavisa/dataset/test.csv
+Embedding: w2v
+
+Embedding arguments: {'model_path': './w2v-models/100_5_100_250_model'}
+
+> model loaded
+Learning rate: 0.003
+Number of epochs: 100
+Hidden size: 250
+
+> training complete
+Epoch 0/100, loss = 0.0
+Epoch 100/100, loss = 0.667
+
+> evaluation complete
+Accuracy: 0.593
+Precision: 0.5978944235799497
+Recall: 0.593
+F1-score: 0.59
+Matthew's correlation: 0.19083166815741387
