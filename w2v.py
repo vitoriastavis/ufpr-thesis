@@ -1,8 +1,5 @@
-import nltk
-import urllib
-import sys
+
 import re
-import bs4 as bs
 import re
 from gensim.models import Word2Vec
 from nltk.corpus import stopwords
