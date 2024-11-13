@@ -76,14 +76,13 @@ for k, v in best_metrics.items():
 results_table = []
 for embedding, data in best_metrics.items():
     row = {
-        'Method': embedding,
+        'Embedding': embedding,
         'Accuracy': data['acc'],
         'F1 Score': data['f1'],
         'MCC': data['mcc'],
         'Learning Rate': data['params'].get('learning_rate', 'N/A'),
         'Num Epochs': data['params'].get('num_epochs', 'N/A'),
         'Hidden Size': data['params'].get('hidden_size', 'N/A'),
-        'Embedding': data['params'].get('embedding', 'N/A')
     }
     results_table.append(row)
 

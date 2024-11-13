@@ -1,5 +1,4 @@
 import os
-import sys
 import torch
 import torch.nn as nn
 import numpy as np
@@ -14,6 +13,7 @@ import w2v
 import grover
 import dnabert1
 import dnabert2
+import ntv2
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -35,7 +35,8 @@ class Classifier(nn.Module):
             batch_size = inputs.size()
         elif self.embedding == 'grover':
             batch_size, _ = inputs.size()
-            #_, batch_size = inputs.size()
+        elif self.embedding == 'nt':
+            batch_size, _ = inputs.size()
 
         inputs = inputs.view(batch_size, -1)  
     
@@ -46,7 +47,6 @@ class Classifier(nn.Module):
         logits = self.classifier(output)
         
         return logits
-
 
 # Calculate accuracy, f1, matthews correlation, precision and recall
 def calculate_metrics(predictions: np.ndarray, labels: np.ndarray):
@@ -93,11 +93,15 @@ def prepare_datasets(train_path, eval_path, embedding, embedding_args):
                                                                 embedding_args['pooling']
                                                                 )                                       
     # Apply dnabert2                                                                  
-    else:
+    elif embedding == 'dnabert2':
         x_train, y_train, x_eval, y_eval = dnabert2.process_csv(train_path,
                                                                 eval_path,
                                                                 embedding_args['pooling']
                                                                 )
+    else:
+        x_train, y_train, x_eval, y_eval = ntv2.process_csv(train_path,
+                                                            eval_path,
+                                                            )
 
     # Create torch datasets
     train_dataset = dataset.MyDataset(x_train, y_train)
@@ -240,7 +244,8 @@ def run(embedding, train_path, eval_path, output_path, learning_rate, hidden_siz
 def main():
     train_path, eval_path, results_path = parse_arguments()
 
-    all_embeddings = ['onehot', 'w2v', 'grover', 'dnabert1', 'dnabert2']
+    # all_embeddings = ['onehot', 'w2v', 'grover', 'dnabert1', 'dnabert2']
+    all_embeddings = ['nt']
     learning_rates = [0.003, 0.0003] 
     num_epochs = [20, 100]          
     pooling_methods =  ['mean', 'max']
@@ -257,8 +262,7 @@ def main():
                 if embedding == 'onehot':  
                     output_path = f'{results_path}/{embedding}/{count}'
                     hidden_size = 404                   
-                    embedding_args = {}
-                    run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
+                    run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, {})
                     print(f'terminei {embedding} {count}')                   
                     count += 1
 
@@ -287,6 +291,12 @@ def main():
                         run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, embedding_args)
                         print(f'terminei {embedding} {count}')
                         count += 1
+
+                elif embedding == 'nt':
+                    output_path = f'{results_path}/{embedding}/{count}'
+                    run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, {})
+                    print(f'terminei {embedding} {count}')
+                    count += 1
 
                 elif embedding == 'dnabert2':
                     for pooling in pooling_methods:

@@ -1,5 +1,5 @@
-Accuracy,Embedding,F1 Score,Hidden Size,Learning Rate,MCC,Method,Num Epochs
-0.63,N/A,0.63,250,0.003,0.26,w2v,20
-0.5,N/A,0.33,768,0.0003,0.0,dnabert1,100
-0.76,N/A,0.76,768,0.0003,0.53,dnabert2,100
-0.76,N/A,0.76,768,0.0003,0.53,grover,100
+Embedding,Accuracy,F1 Score,MCC,Learning Rate,Num Epochs,Hidden Size
+w2v,0.63,0.62,0.26,0.003,100,250
+dnabert1,0.5,0.33,0.0,0.0003,20,768
+dnabert2,0.76,0.76,0.53,0.0003,20,768
+grover,0.76,0.76,0.53,0.0003,20,768
