@@ -293,6 +293,7 @@ def main():
                         count += 1
 
                 elif embedding == 'nt':
+                    hidden_size = 768
                     output_path = f'{results_path}/{embedding}/{count}'
                     run(embedding, train_path, eval_path, output_path, learning_rate, hidden_size, epochs, {})
                     print(f'terminei {embedding} {count}')

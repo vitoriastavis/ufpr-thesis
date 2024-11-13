@@ -5,7 +5,7 @@ from transformers import AutoTokenizer, AutoModelForMaskedLM
 import torch
 import pandas as pd
 
-def nt(sequence, tokenizer, model, pooling):
+def nt(sequence, tokenizer, model):
     # inputs = tokenizer(sequence, return_tensors = 'pt')["input_ids"]
     max_length = tokenizer.model_max_length
     tokens_ids = tokenizer.batch_encode_plus(sequence, return_tensors="pt",
@@ -36,11 +36,8 @@ def nt(sequence, tokenizer, model, pooling):
     return embedding.detach().numpy()
 
 # Função para ler o CSV e gerar os encodings
-def process_csv(train_file, eval_file, pooling):
+def process_csv(train_file, eval_file):
 
-    if pooling != 'mean' and pooling != 'max':
-        raise TypeError(f"pooling must be 'mean' or 'max'")
-    
     # Read files for classifier training and classifier eval
     df_train = pd.read_csv(train_file)    
     df_eval = pd.read_csv(eval_file) 
