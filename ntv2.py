@@ -1,9 +1,7 @@
-import haiku as hk
-import jax
-import jax.numpy as jnp
-from transformers import AutoTokenizer, AutoModelForMaskedLM
-import torch
+
+from transformers import AutoTokenizer, AutoModel
 import pandas as pd
+from transformers.models.bert.configuration_bert import BertConfig
 
 def nt(sequence, tokenizer, model):
     # inputs = tokenizer(sequence, return_tensors = 'pt')["input_ids"]
@@ -50,11 +48,12 @@ def process_csv(train_file, eval_file):
 
     # Import the tokenizer and the model
     tokenizer = AutoTokenizer.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
-    model = AutoModelForMaskedLM.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+    config = BertConfig.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+    model = AutoModel.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref", trust_remote_code=True, config=config)
 
     # Apply encoding to train and eval
-    encoded_train = [nt(seq, tokenizer, model, pooling) for seq in x_train]    
-    encoded_eval = [nt(seq, tokenizer, model, pooling) for seq in x_eval]    
+    encoded_train = [nt(seq, tokenizer, model) for seq in x_train]    
+    encoded_eval = [nt(seq, tokenizer, model) for seq in x_eval]    
 
     print(f"Embeddings shape: {encoded_train.shape}")
     
