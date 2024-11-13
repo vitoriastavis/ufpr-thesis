@@ -1,0 +1,22 @@
+> datasets loaded
+Train: /mnt/NAS/stavisa/dataset/train.csv
+Eval: /mnt/NAS/stavisa/dataset/test.csv
+Embedding: dnabert2
+
+Embedding arguments: {'pooling': 'mean'}
+
+> model loaded
+Learning rate: 0.003
+Number of epochs: 100
+Hidden size: 768
+
+> training complete
+Epoch 0/100, loss = 0.0
+Epoch 100/100, loss = 0.541
+
+> evaluation complete
+Accuracy: 0.743
+Precision: 0.7602136090304017
+Recall: 0.743
+F1-score: 0.74
+Matthew's correlation: 0.502919106793081
