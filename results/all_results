@@ -1,0 +1,123 @@
+All Data:
+w2v (23): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.62, 'f1': 0.62, 'mcc': 0.26} 
+
+w2v (14): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.62, 'mcc': 0.26} 
+
+w2v (20): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.62, 'f1': 0.6, 'mcc': 0.25} 
+
+w2v (26): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.6, 'f1': 0.59, 'mcc': 0.2} 
+
+w2v (28): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.62, 'f1': 0.61, 'mcc': 0.26} 
+
+w2v (24): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.62, 'mcc': 0.26} 
+
+w2v (8): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.62, 'f1': 0.62, 'mcc': 0.25} 
+
+w2v (27): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.6, 'f1': 0.59, 'mcc': 0.21} 
+
+w2v (31): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.62, 'mcc': 0.27} 
+
+w2v (10): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.59, 'f1': 0.59, 'mcc': 0.19} 
+
+w2v (17): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.6, 'f1': 0.59, 'mcc': 0.2} 
+
+w2v (21): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.6, 'f1': 0.59, 'mcc': 0.21} 
+
+w2v (30): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.62, 'mcc': 0.27} 
+
+w2v (29): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.6, 'f1': 0.59, 'mcc': 0.21} 
+
+w2v (16): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.62, 'mcc': 0.26} 
+
+w2v (25): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.6, 'f1': 0.59, 'mcc': 0.2} 
+
+w2v (9): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.59, 'f1': 0.59, 'mcc': 0.19} 
+
+w2v (4): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.63, 'mcc': 0.26} 
+
+w2v (7): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.63, 'mcc': 0.26} 
+
+w2v (5): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.59, 'f1': 0.59, 'mcc': 0.19} 
+
+w2v (22): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.62, 'f1': 0.62, 'mcc': 0.26} 
+
+w2v (18): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.6, 'f1': 0.59, 'mcc': 0.21} 
+
+w2v (32): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.62, 'mcc': 0.27} 
+
+w2v (19): {'embedding_args': "{'model_path'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.6, 'f1': 0.59, 'mcc': 0.21} 
+
+w2v (6): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.62, 'mcc': 0.26} 
+
+w2v (1): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.59, 'f1': 0.59, 'mcc': 0.19} 
+
+w2v (12): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.63, 'mcc': 0.26} 
+
+w2v (15): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.63, 'f1': 0.63, 'mcc': 0.26} 
+
+w2v (3): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.59, 'f1': 0.59, 'mcc': 0.19} 
+
+w2v (11): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.59, 'f1': 0.59, 'mcc': 0.19} 
+
+w2v (13): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 250, 'acc': 0.59, 'f1': 0.59, 'mcc': 0.19} 
+
+w2v (2): {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250, 'acc': 0.59, 'f1': 0.59, 'mcc': 0.19} 
+
+dnabert1 (8): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.5, 'f1': 0.33, 'mcc': 0.0} 
+
+dnabert1 (4): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.5, 'f1': 0.33, 'mcc': 0.0} 
+
+dnabert1 (7): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.5, 'f1': 0.33, 'mcc': 0.0} 
+
+dnabert1 (5): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.5, 'f1': 0.33, 'mcc': 0.0} 
+
+dnabert1 (6): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.5, 'f1': 0.33, 'mcc': 0.0} 
+
+dnabert1 (1): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.5, 'f1': 0.33, 'mcc': 0.0} 
+
+dnabert1 (3): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.5, 'f1': 0.33, 'mcc': 0.0} 
+
+dnabert1 (2): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.5, 'f1': 0.33, 'mcc': 0.0} 
+
+dnabert2 (8): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.71, 'f1': 0.71, 'mcc': 0.44} 
+
+dnabert2 (4): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.69, 'f1': 0.69, 'mcc': 0.4} 
+
+dnabert2 (7): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.76, 'f1': 0.76, 'mcc': 0.53} 
+
+dnabert2 (5): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.76, 'f1': 0.76, 'mcc': 0.53} 
+
+dnabert2 (6): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.72, 'f1': 0.72, 'mcc': 0.44} 
+
+dnabert2 (1): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.74, 'f1': 0.73, 'mcc': 0.5} 
+
+dnabert2 (3): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.74, 'f1': 0.74, 'mcc': 0.5} 
+
+dnabert2 (2): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.71, 'f1': 0.71, 'mcc': 0.42} 
+
+grover (8): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.71, 'f1': 0.69, 'mcc': 0.47} 
+
+grover (4): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.73, 'f1': 0.73, 'mcc': 0.48} 
+
+grover (7): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.76, 'f1': 0.76, 'mcc': 0.53} 
+
+grover (5): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.76, 'f1': 0.76, 'mcc': 0.53} 
+
+grover (6): {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.71, 'f1': 0.69, 'mcc': 0.47} 
+
+grover (1): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.73, 'f1': 0.73, 'mcc': 0.46} 
+
+grover (3): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 100, 'hidden_size': 768, 'acc': 0.72, 'f1': 0.72, 'mcc': 0.44} 
+
+grover (2): {'embedding_args': "{'pooling'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 768, 'acc': 0.74, 'f1': 0.74, 'mcc': 0.47} 
+
+
+Best Metrics:
+w2v: {'acc': 0.63, 'f1': 0.63, 'mcc': 0.26, 'params': {'embedding_args': "{'model_path'", 'learning_rate': 0.003, 'num_epochs': 20, 'hidden_size': 250}} 
+
+dnabert1: {'acc': 0.5, 'f1': 0.33, 'mcc': 0.0, 'params': {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768}} 
+
+dnabert2: {'acc': 0.76, 'f1': 0.76, 'mcc': 0.53, 'params': {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768}} 
+
+grover: {'acc': 0.76, 'f1': 0.76, 'mcc': 0.53, 'params': {'embedding_args': "{'pooling'", 'learning_rate': 0.0003, 'num_epochs': 100, 'hidden_size': 768}} 
+
