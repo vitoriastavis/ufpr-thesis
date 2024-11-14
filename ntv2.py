@@ -1,5 +1,5 @@
 
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, AutoModelForMaskedLM, EsmConfig
 import pandas as pd
 from transformers.models.bert.configuration_bert import BertConfig
 
@@ -47,9 +47,16 @@ def process_csv(train_file, eval_file):
     y_eval = df_eval['label'] 
 
     # Import the tokenizer and the model
+    # tokenizer = AutoTokenizer.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+    # config = BertConfig.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+    # model = AutoModel.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref", trust_remote_code=True, config=config)
+
+    # tokenizer = AutoTokenizer.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+    # model = AutoModelForMaskedLM.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+
     tokenizer = AutoTokenizer.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
-    config = BertConfig.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
-    model = AutoModel.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref", trust_remote_code=True, config=config)
+    config = EsmConfig.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+    model = AutoModelForMaskedLM.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref", config=config, force_download=True)
 
     # Apply encoding to train and eval
     encoded_train = [nt(seq, tokenizer, model) for seq in x_train]    
