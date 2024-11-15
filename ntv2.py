@@ -55,9 +55,11 @@ def process_csv(train_file, eval_file):
     # model = AutoModelForMaskedLM.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
 
     tokenizer = AutoTokenizer.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+    # print('token ready ')
     config = EsmConfig.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref")
+    # print('config ready ')
     model = AutoModelForMaskedLM.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-human-ref", config=config, force_download=True)
-
+    # print('ready ')
     # Apply encoding to train and eval
     encoded_train = [nt(seq, tokenizer, model) for seq in x_train]    
     encoded_eval = [nt(seq, tokenizer, model) for seq in x_eval]    
