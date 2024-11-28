@@ -2,7 +2,6 @@
 import re
 import re
 from gensim.models import Word2Vec
-from nltk.corpus import stopwords
 import pandas as pd
 import numpy as np
 from transformers import AutoTokenizer
@@ -139,7 +138,7 @@ def bpe(train, vocab_size):
     return tokens
 
 # Função para ler o CSV e gerar os encodings
-def process_csv(train_file, eval_file, model_path):
+def process_sequences(x_train, x_eval, model_path):
 
     # Get the vocab size that matches the trained model
     match = re.search(r"(\d+)_(\d+)_(\d+)_(\d+)_model", model_path)
@@ -153,16 +152,6 @@ def process_csv(train_file, eval_file, model_path):
     # Carregar o modelo treinado do caminho especificado
     model = Word2Vec.load(model_path)
 
-    # Read files for training and eval
-    df_train = pd.read_csv(train_file)    
-    df_eval = pd.read_csv(eval_file) 
-
-    x_train = df_train['sequence']
-    y_train = df_train['label']
-
-    x_eval = df_eval['sequence']
-    y_eval = df_eval['label']
-    
     # Create BPE tokens
     token_train = bpe(x_train, vocab_size)
     token_eval = bpe(x_eval, vocab_size)
@@ -171,7 +160,7 @@ def process_csv(train_file, eval_file, model_path):
     encoded_train = apply_w2v(model, token_train, vector_length)
     encoded_eval = apply_w2v(model, token_eval, vector_length)
 
-    return encoded_train, y_train, encoded_eval, y_eval
+    return encoded_train, encoded_eval
 
 def main():
     # Argument parsing 

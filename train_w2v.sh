@@ -4,7 +4,7 @@
 VOCAB_SIZES=(50 100)
 WINDOW_SIZES=(5 10)
 EPOCHS=(100 250)
-VECTOR_LENGTHS=(50 150 250)
+VECTOR_LENGTHS=(250)
 
 # Caminho do arquivo de treino e o caminho para salvar o modelo
 TRAIN_PATH=$1

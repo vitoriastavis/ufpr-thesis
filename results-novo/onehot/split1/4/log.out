@@ -1,0 +1,18 @@
+> datasets loaded
+Embedding: onehot
+
+> model loaded
+Learning rate: 0.0003
+Number of epochs: 100
+Hidden size: 404
+
+> training complete
+Epoch 0/100, loss = 0.0
+Epoch 100/100, loss = 0.658
+
+> evaluation complete
+Accuracy: 0.6252484742807324
+Precision: 0.6252524219660762
+Recall: 0.6252485711183169
+F1-score: 0.63
+Matthew's correlation: 0.25050099305479434

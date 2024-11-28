@@ -21,22 +21,11 @@ def grover(sequence, tokenizer, model, pooling):
   return embedding.detach().numpy()
 
 # Função para ler o CSV e gerar os encodings
-def process_csv(train_file, eval_file, pooling):
+def process_sequences(x_train, x_eval, pooling):
 
     if pooling != 'mean' and pooling != 'max':
         raise TypeError(f"pooling must be 'mean' or 'max'")
     
-    # Read files for classifier training and classifier eval
-
-    df_train = pd.read_csv(train_file)    
-    df_eval = pd.read_csv(eval_file) 
-
-    x_train = df_train['sequence']
-    y_train = df_train['label']
-
-    x_eval = df_eval['sequence']
-    y_eval = df_eval['label'] 
-
     # Load tokenizer and model
     tokenizer = AutoTokenizer.from_pretrained("PoetschLab/GROVER",trust_remote_code=True)
     model = AutoModel.from_pretrained("PoetschLab/GROVER",trust_remote_code=True)
@@ -45,5 +34,5 @@ def process_csv(train_file, eval_file, pooling):
     encoded_train = [grover(seq, tokenizer, model, pooling) for seq in x_train]    
     encoded_eval = [grover(seq, tokenizer, model, pooling) for seq in x_eval]    
 
-    return encoded_train, y_train, encoded_eval, y_eval
+    return encoded_train, encoded_eval
 

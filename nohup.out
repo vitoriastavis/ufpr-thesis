@@ -1,0 +1,10 @@
+Defaulting to user installation because normal site-packages is not writeable
+Collecting einops
+  Downloading einops-0.8.0-py3-none-any.whl.metadata (12 kB)
+Downloading einops-0.8.0-py3-none-any.whl (43 kB)
+WARNING: Error parsing dependencies of distro-info: Invalid version: '0.18ubuntu0.18.04.1'
+Installing collected packages: einops
+Successfully installed einops-0.8.0
+Defaulting to user installation because normal site-packages is not writeable
+Requirement already satisfied: einops in /home/stavisa/.local/lib/python3.8/site-packages (0.8.0)
+WARNING: Error parsing dependencies of distro-info: Invalid version: '0.18ubuntu0.18.04.1'

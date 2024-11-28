@@ -1,0 +1,20 @@
+> datasets loaded
+Embedding: grover
+
+Embedding arguments: {'pooling': 'max'}
+
+> model loaded
+Learning rate: 0.003
+Number of epochs: 100
+Hidden size: 768
+
+> training complete
+Epoch 0/100, loss = 0.0
+Epoch 100/100, loss = 0.889
+
+> evaluation complete
+Accuracy: 0.692868352223191
+Precision: 0.6931942343437315
+Recall: 0.6928676355274159
+F1-score: 0.69
+Matthew's correlation: 0.38606173172385266

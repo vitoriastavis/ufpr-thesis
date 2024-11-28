@@ -1,0 +1,20 @@
+> datasets loaded
+Embedding: w2v
+
+Embedding arguments: {'model_path': './w2v-models/50_5_100_250_model'}
+
+> model loaded
+Learning rate: 0.0003
+Number of epochs: 100
+Hidden size: 250
+
+> training complete
+Epoch 0/100, loss = 0.0
+Epoch 100/100, loss = 0.652
+
+> evaluation complete
+Accuracy: 0.6251089799476897
+Precision: 0.6251541886227427
+Recall: 0.6251093102891322
+F1-score: 0.63
+Matthew's correlation: 0.2502634948879864

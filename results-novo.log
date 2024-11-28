@@ -1,0 +1,242 @@
+nohup: ignoring input
+/home/stavisa/.local/lib/python3.8/site-packages/torch/autograd/graph.py:769: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 11040). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+Done onehot 1
+Done onehot 2
+Done onehot 3
+Done onehot 4
+Done onehot 5
+Done onehot 6
+Done onehot 7
+Done onehot 8
+Done onehot 9
+Done onehot 10
+Done onehot 11
+Done onehot 12
+Done w2v 1
+Done w2v 2
+Done w2v 3
+Done w2v 4
+Done w2v 5
+Done w2v 6
+Done w2v 7
+Done w2v 8
+Done w2v 9
+Done w2v 10
+Done w2v 11
+Done w2v 12
+Done w2v 13
+Done w2v 14
+Done w2v 15
+Done w2v 16
+Done w2v 17
+Done w2v 18
+Done w2v 19
+Done w2v 20
+Done w2v 21
+Done w2v 22
+Done w2v 23
+Done w2v 24
+Done w2v 25
+Done w2v 26
+Done w2v 27
+Done w2v 28
+Done w2v 29
+Done w2v 30
+Done w2v 31
+Done w2v 32
+Done w2v 33
+Done w2v 34
+Done w2v 35
+Done w2v 36
+Done w2v 37
+Done w2v 38
+Done w2v 39
+Done w2v 40
+Done w2v 41
+Done w2v 42
+Done w2v 43
+Done w2v 44
+Done w2v 45
+Done w2v 46
+Done w2v 47
+Done w2v 48
+Done w2v 49
+Done w2v 50
+Done w2v 51
+Done w2v 52
+Done w2v 53
+Done w2v 54
+Done w2v 55
+Done w2v 56
+Done w2v 57
+Done w2v 58
+Done w2v 59
+Done w2v 60
+Done w2v 61
+Done w2v 62
+Done w2v 63
+Done w2v 64
+Done w2v 65
+Done w2v 66
+Done w2v 67
+Done w2v 68
+Done w2v 69
+Done w2v 70
+Done w2v 71
+Done w2v 72
+Done w2v 73
+Done w2v 74
+Done w2v 75
+Done w2v 76
+Done w2v 77
+Done w2v 78
+Done w2v 79
+Done w2v 80
+Done w2v 81
+Done w2v 82
+Done w2v 83
+Done w2v 84
+Done w2v 85
+Done w2v 86
+Done w2v 87
+Done w2v 88
+Done w2v 89
+Done w2v 90
+Done w2v 91
+Done w2v 92
+Done w2v 93
+Done w2v 94
+Done w2v 95
+Done w2v 96
+Done grover 1
+Done grover 2
+Done grover 3
+Done grover 4
+Done grover 5
+Done grover 6
+Done grover 7
+Done grover 8
+Done grover 9
+Done grover 10
+Done grover 11
+Done grover 12
+Done grover 13
+Done grover 14
+Done grover 15
+Done grover 16
+Done grover 17
+Done grover 18
+Done grover 19
+Done grover 20
+Done grover 21
+Done grover 22
+Done grover 23
+Done grover 24
+Done dnabert1 1
+Done dnabert1 2
+Done dnabert1 3
+Done dnabert1 4
+Done dnabert1 5
+Done dnabert1 6
+Done dnabert1 7
+Done dnabert1 8
+Done dnabert1 9
+Done dnabert1 10
+Done dnabert1 11
+Done dnabert1 12
+Done dnabert1 13
+Done dnabert1 14
+Done dnabert1 15
+Done dnabert1 16
+Done dnabert1 17
+Done dnabert1 18
+Done dnabert1 19
+Done dnabert1 20
+Done dnabert1 21
+Done dnabert1 22
+Done dnabert1 23
+Encountered exception while importing einops: No module named 'einops'
+Done dnabert1 24
+Traceback (most recent call last):
+  File "main.py", line 358, in <module>
+    main()
+  File "main.py", line 353, in main
+    run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
+  File "main.py", line 249, in run
+    dataloader_train, dataloader_eval = prepare_datasets(split, embedding, embedding_args)
+  File "main.py", line 104, in prepare_datasets
+    encoded_train, encoded_eval = dnabert2.process_sequences(x_train, x_eval,
+  File "/home/stavisa/ufpr-thesis/dnabert2.py", line 31, in process_sequences
+    model = AutoModel.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True, config=config)
+  File "/home/stavisa/.local/lib/python3.8/site-packages/transformers/models/auto/auto_factory.py", line 553, in from_pretrained
+    model_class = get_class_from_dynamic_module(
+  File "/home/stavisa/.local/lib/python3.8/site-packages/transformers/dynamic_module_utils.py", line 540, in get_class_from_dynamic_module
+    final_module = get_cached_module_file(
+  File "/home/stavisa/.local/lib/python3.8/site-packages/transformers/dynamic_module_utils.py", line 365, in get_cached_module_file
+    modules_needed = check_imports(resolved_module_file)
+  File "/home/stavisa/.local/lib/python3.8/site-packages/transformers/dynamic_module_utils.py", line 197, in check_imports
+    raise ImportError(
+ImportError: This modeling file requires the following packages that were not found in your environment: einops. Run `pip install einops`
+nohup: ignoring input
+Traceback (most recent call last):
+  File "main.py", line 358, in <module>
+    main()
+  File "main.py", line 353, in main
+    run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
+UnboundLocalError: local variable 'hidden_size' referenced before assignment
+nohup: ignoring input
+Some weights of BertModel were not initialized from the model checkpoint at zhihan1996/DNABERT-2-117M and are newly initialized: ['bert.pooler.dense.bias', 'bert.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Traceback (most recent call last):
+  File "main.py", line 360, in <module>
+    main()
+  File "main.py", line 355, in main
+    run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
+  File "main.py", line 249, in run
+    dataloader_train, dataloader_eval = prepare_datasets(split, embedding, embedding_args)
+  File "main.py", line 104, in prepare_datasets
+    encoded_train, encoded_eval = dnabert2.process_sequences(x_train, x_eval,
+  File "/home/stavisa/ufpr-thesis/dnabert2.py", line 34, in process_sequences
+    encoded_train = [dnabert2(seq, tokenizer, model, pooling) for seq in x_train]    
+  File "/home/stavisa/ufpr-thesis/dnabert2.py", line 34, in <listcomp>
+    encoded_train = [dnabert2(seq, tokenizer, model, pooling) for seq in x_train]    
+  File "/home/stavisa/ufpr-thesis/dnabert2.py", line 10, in dnabert2
+    hidden_states = model(inputs)[0] # [1, sequence_length, 768]
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/stavisa/.cache/huggingface/modules/transformers_modules/zhihan1996/DNABERT-2-117M/d064dece8a8b41d9fb8729fbe3435278786931f1/bert_layers.py", line 609, in forward
+    encoder_outputs = self.encoder(
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/stavisa/.cache/huggingface/modules/transformers_modules/zhihan1996/DNABERT-2-117M/d064dece8a8b41d9fb8729fbe3435278786931f1/bert_layers.py", line 447, in forward
+    hidden_states = layer_module(hidden_states,
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/stavisa/.cache/huggingface/modules/transformers_modules/zhihan1996/DNABERT-2-117M/d064dece8a8b41d9fb8729fbe3435278786931f1/bert_layers.py", line 328, in forward
+    attention_output = self.attention(hidden_states, cu_seqlens, seqlen,
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/stavisa/.cache/huggingface/modules/transformers_modules/zhihan1996/DNABERT-2-117M/d064dece8a8b41d9fb8729fbe3435278786931f1/bert_layers.py", line 241, in forward
+    self_output = self.self(input_tensor, cu_seqlens, max_s, indices,
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/stavisa/.cache/huggingface/modules/transformers_modules/zhihan1996/DNABERT-2-117M/d064dece8a8b41d9fb8729fbe3435278786931f1/bert_layers.py", line 182, in forward
+    attention = flash_attn_qkvpacked_func(qkv, bias)
+  File "/home/stavisa/.local/lib/python3.8/site-packages/torch/autograd/function.py", line 574, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+  File "/home/stavisa/.cache/huggingface/modules/transformers_modules/zhihan1996/DNABERT-2-117M/d064dece8a8b41d9fb8729fbe3435278786931f1/flash_attn_triton.py", line 1021, in forward
+    o, lse, ctx.softmax_scale = _flash_attn_forward(
+  File "/home/stavisa/.cache/huggingface/modules/transformers_modules/zhihan1996/DNABERT-2-117M/d064dece8a8b41d9fb8729fbe3435278786931f1/flash_attn_triton.py", line 781, in _flash_attn_forward
+    assert q.is_cuda and k.is_cuda and v.is_cuda
+AssertionError
