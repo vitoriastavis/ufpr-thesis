@@ -1,14 +1,11 @@
 from transformers import AutoTokenizer, AutoModelForMaskedLM, AutoModel
 import torch
-import numpy as np
-import pandas as pd
+from transformers.models.bert.configuration_bert import BertConfig
 
 def grover(sequence, tokenizer, model, pooling):
     
   inputs = tokenizer(sequence, return_tensors = 'pt')["input_ids"]
-  hidden_states = model(inputs)[0] # [1, sequence_length, 768]
-
-#   print(hidden_states.shape)
+  hidden_states = model(inputs)[0] 
 
   # embedding with mean pooling
   if pooling == 'mean':
@@ -21,14 +18,22 @@ def grover(sequence, tokenizer, model, pooling):
   return embedding.detach().numpy()
 
 # Função para ler o CSV e gerar os encodings
-def process_sequences(x_train, x_eval, pooling):
+def process_sequences(x_train, x_eval, pooling, model_type):
 
     if pooling != 'mean' and pooling != 'max':
         raise TypeError(f"pooling must be 'mean' or 'max'")
     
+    if model_type == 'pretrained':
+       model_path = 'PoetschLab/GROVER'
+    elif model_type == 'finetuned-cancer':
+       model_path = 'UKaizokuO/GROVER-finetuned-cancer'
+    else:
+       raise TypeError(f"model_type must be 'pretrained' or 'finetuned-cancer'")
+    
     # Load tokenizer and model
-    tokenizer = AutoTokenizer.from_pretrained("PoetschLab/GROVER",trust_remote_code=True)
-    model = AutoModel.from_pretrained("PoetschLab/GROVER",trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(model_path,trust_remote_code=True)
+    config = BertConfig.from_pretrained(model_path)
+    model = AutoModel.from_pretrained(model_path,trust_remote_code=True, config=config)
     
     # Apply encoding to train and eval
     encoded_train = [grover(seq, tokenizer, model, pooling) for seq in x_train]    

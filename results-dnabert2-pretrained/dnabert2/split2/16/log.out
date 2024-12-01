@@ -1,0 +1,20 @@
+> datasets loaded
+Embedding: dnabert2
+
+Embedding arguments: {'pooling': 'max'}
+
+> model loaded
+Learning rate: 0.0003
+Number of epochs: 100
+Hidden size: 768
+
+> training complete
+Epoch 0/100, loss = 0.0
+Epoch 100/100, loss = 0.618
+
+> evaluation complete
+Accuracy: 0.6847079337401918
+Precision: 0.6898645671493473
+Recall: 0.6847050595545698
+F1-score: 0.68
+Matthew's correlation: 0.3745340902114136
