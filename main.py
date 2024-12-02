@@ -27,18 +27,18 @@ class Classifier(nn.Module):
         self.embedding = embedding
 
     def forward(self, inputs):
-        
-        if self.embedding == 'w2v':           
-            batch_size, _ = inputs.size()
-        elif self.embedding == 'onehot':
-            batch_size, _, _ = inputs.size()
-        elif self.embedding == 'dnabert1' or self.embedding == 'dnabert2':
-            batch_size = inputs.size()
-        elif self.embedding == 'grover':
-            batch_size, _ = inputs.size()
-        elif self.embedding == 'nt':
-            batch_size, _ = inputs.size()
 
+        embedding = self.embedding.split('-')[0]
+        
+        if embedding == 'w2v':            
+            batch_size, _ = inputs.size()
+        elif embedding == 'onehot':
+            batch_size, _, _ = inputs.size()
+        elif embedding == 'dnabert1' or embedding == 'dnabert2':
+            batch_size = inputs.size()
+        elif embedding == 'grover':
+            batch_size, _ = inputs.size()
+ 
         inputs = inputs.view(batch_size, -1)  
     
         # Apply dropout
@@ -86,21 +86,22 @@ def prepare_datasets(split, embedding, embedding_args):
         encoded_train, encoded_eval = onehot.process_sequences(x_train, x_eval)
 
     # Apply word2vec to x_train and x_eval 
-    elif embedding == 'w2v':    
+    elif embedding == 'w2v-bpe' or embedding == 'w2v-kmer':     
         encoded_train, encoded_eval = w2v.process_sequences(x_train, x_eval,
-                                                            embedding_args['model_path']) 
+                                                            embedding_args['model_path'],
+                                                            embedding_args['tokenization']) 
     # Apply grover to x_train and x_eval                                      
-    elif embedding == 'grover':
+    elif embedding == 'grover-pretrained' or embedding == 'grover-finetuned-cancer':
         encoded_train, encoded_eval = grover.process_sequences(x_train, x_eval,
                                                                 embedding_args['pooling'],
                                                                 embedding_args['model_type'])                                                                                                                         
     # Apply dnabert1 to x_train and x_eval                                        
-    elif embedding == 'dnabert1':
+    elif embedding == 'dnabert1-pretrained' or embedding == 'dnabert1-finetuned-motifs':
         encoded_train, encoded_eval = dnabert1.process_sequences(x_train, x_eval,
                                                                 embedding_args['pooling'],
                                                                 embedding_args['model_type'])                 
     # Apply dnabert2 to x_train and x_eval                                                               
-    elif embedding == 'dnabert2':
+    elif embedding == 'dnabert2-pretrained' or embedding == 'dnabert2-finetuned-cancer':
         encoded_train, encoded_eval = dnabert2.process_sequences(x_train, x_eval,
                                                                 embedding_args['pooling'],
                                                                 embedding_args['model_type'])  
@@ -123,7 +124,7 @@ def train(model, dataloader, num_epochs, optimizer, loss_function):
 
     # Training loop
     for epoch in range(num_epochs):
-        total_loss = 0
+        total_loss = 0  
 
         # Iterate through batches 
         for batch in dataloader: 
@@ -284,23 +285,20 @@ def main():
     file_path, results_path = parse_arguments()
 
     # all_embeddings = ['onehot', 'w2v', 'grover', 'dnabert1', 'dnabert2']
-    learning_rates = [0.003, 0.0003] 
-    num_epochs = [20, 100]          
-    pooling_methods =  ['mean', 'max']
-    # dnabert_models = ['pretrained',
-    #                   'finetuned-motifs']
-    # dnabert2_models = ['pretrained',
-    #                   'finetuned-cancer']
-    # grover_models = ['pretrained',
-    #                  'finetuned-cancer']
+    # all_embeddings = ['w2v-bpe', 'w2v-kmer',
+    #                   'dnabert1-pretrained', 'dnabert1-finetuned-motifs',
+    #                   'dnabert2-pretrained', 'dnabert2-finetuned-cancer',
+    #                   'grover-pretrained'
+    #                   'grover-finetuned-cancer']
+    # learning_rates = [0.003, 0.0003] 
+    # num_epochs = [20, 100]          
+    # pooling_methods =  ['mean', 'max']
 
-    all_embeddings = ['dnabert1', 'dnabert2', 'grover']
-    # learning_rates = [0.003] 
-    # num_epochs = [20, 10]          
-    # pooling_methods =  ['mean']
-    dnabert1_models = ['pretrained']
-    dnabert2_models = ['finetuned-cancer']
-    grover_models = ['finetuned-cancer']
+    all_embeddings = ['w2v-kmer']
+
+    learning_rates = [0.003] 
+    num_epochs = [20, 10]          
+    pooling_methods =  ['mean']
 
     w2v_path = './w2v-models'
     w2v_models = [os.path.join(w2v_path, f) for f in os.listdir(w2v_path) if os.path.isfile(os.path.join(w2v_path, f)) and f.endswith('_model')]
@@ -311,7 +309,7 @@ def main():
     for embedding in all_embeddings:
 
         # Begins counting for each embedding
-        count = 25
+        count = 1
 
         for i in range(n_splits):
 
@@ -328,44 +326,41 @@ def main():
                         print(f'Done {embedding} {count}')                   
                         count += 1
 
-                    elif embedding == 'w2v':  
+                    elif embedding == 'w2v-bpe' or embedding == 'w2v-kmer':  
                         hidden_size = 250                     
                         for model_path in w2v_models:
                             output_path = f'{results_path}/{embedding}/split{i+1}/{count}'
-                            embedding_args = {'model_path': model_path}
+                            embedding_args = {'model_path': model_path, 'tokenization': embedding}
                             run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
                             print(f'Done {embedding} {count}')
                             count += 1
 
-                    elif embedding == 'grover':
+                    elif embedding == 'grover-pretrained' or embedding == 'grover-finetuned-cancer':
                         hidden_size = 768
                         for pooling in pooling_methods:
-                            for model_type in grover_models:
-                                output_path = f'{results_path}/{embedding}/split{i+1}/{count}'
-                                embedding_args = {'pooling': pooling, 'model_type': model_type}   
-                                run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
-                                print(f'Done {embedding} {count}')
-                                count += 1
+                            output_path = f'{results_path}/{embedding}/split{i+1}/{count}'
+                            embedding_args = {'pooling': pooling, 'model_type': embedding}   
+                            run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
+                            print(f'Done {embedding} {count}')
+                            count += 1
 
-                    elif embedding == 'dnabert1':
+                    elif embedding == 'dnabert1-pretrained' or embedding == 'dnabert1-finetuned-motifs':
                         hidden_size = 768
                         for pooling in pooling_methods:
-                            for model_type in dnabert1_models:
-                                output_path = f'{results_path}/{embedding}/split{i+1}/{count}'
-                                embedding_args = {'pooling': pooling, 'model_type': model_type}   
-                                run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
-                                print(f'Done {embedding} {count}')
-                                count += 1
+                            output_path = f'{results_path}/{embedding}/split{i+1}/{count}'
+                            embedding_args = {'pooling': pooling, 'model_type': embedding}   
+                            run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
+                            print(f'Done {embedding} {count}')
+                            count += 1
 
-                    elif embedding == 'dnabert2':
+                    elif embedding == 'dnabert2-pretrained' or embedding == 'dnabert2-finetuned-cancer':
                         hidden_size = 768
                         for pooling in pooling_methods:
-                            for model_type in dnabert2_models:
-                                output_path = f'{results_path}/{embedding}/split{i+1}/{count}'
-                                embedding_args = {'pooling': pooling, 'model_type': model_type}   
-                                run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
-                                print(f'Done {embedding} {count}')
-                                count += 1
+                            output_path = f'{results_path}/{embedding}/split{i+1}/{count}'
+                            embedding_args = {'pooling': pooling, 'model_type': embedding}   
+                            run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
+                            print(f'Done {embedding} {count}')
+                            count += 1
 
 if __name__ == "__main__":
     main()

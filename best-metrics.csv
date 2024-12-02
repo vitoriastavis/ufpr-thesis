@@ -1,0 +1,5 @@
+Embedding,Accuracy,F1 Score,MCC,Learning Rate,Num Epochs,Hidden Size
+w2v,0,0,0,N/A,N/A,N/A
+dnabert1,0,0,0,N/A,N/A,N/A
+dnabert2,0,0,0,N/A,N/A,N/A
+grover,0,0,0,N/A,N/A,N/A

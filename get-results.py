@@ -12,7 +12,7 @@ all_data = {embedding: {} for embedding in embeddings}
 best_metrics = {embedding: {'acc': 0, 'f1': 0, 'mcc': 0, 'params': {}} for embedding in embeddings}
 
 # Path to the main directory containing method directories
-base_path = 'results/'
+base_path = 'results-novo/'
 
 # Iterate through each method
 for embedding in embeddings:
@@ -91,4 +91,4 @@ df = pd.DataFrame(results_table)
 # print(df)
 
 # Optionally save to CSV or display as needed
-df.to_csv('final-results/best-metrics.csv', index=False)
+df.to_csv('best-metrics.csv', index=False)

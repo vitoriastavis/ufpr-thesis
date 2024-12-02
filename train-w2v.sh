@@ -1,10 +1,15 @@
 #!/bin/bash
 
 # Parâmetros que serão usados
-VOCAB_SIZES=(50 100)
+# VOCAB_SIZES=(50 100)
+# WINDOW_SIZES=(5 10)
+# EPOCHS=(100 250)
+# VECTOR_LENGTHS=(250)
+
+VOCAB_SIZES=(100)
 WINDOW_SIZES=(5 10)
-EPOCHS=(100 250)
-VECTOR_LENGTHS=(250)
+EPOCHS=(250)
+VECTOR_LENGTHS=(768)
 
 # Caminho do arquivo de treino e o caminho para salvar o modelo
 TRAIN_PATH=$1

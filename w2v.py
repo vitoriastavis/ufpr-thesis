@@ -137,8 +137,16 @@ def bpe(train, vocab_size):
 
     return tokens
 
+def generate_kmers(sequence, k):
+    """Gera k-mers a partir de uma sequência de nucleotídeos."""
+    return [sequence[i:i+k] for i in range(len(sequence) - k + 1)]
+
+def kmers(sequences, k):
+    """Tokeniza uma lista de sequências em k-mers."""
+    return [generate_kmers(seq, k) for seq in sequences]
+
 # Função para ler o CSV e gerar os encodings
-def process_sequences(x_train, x_eval, model_path):
+def process_sequences(x_train, x_eval, model_path, tokenization, k=3):
 
     # Get the vocab size that matches the trained model
     match = re.search(r"(\d+)_(\d+)_(\d+)_(\d+)_model", model_path)
@@ -153,8 +161,13 @@ def process_sequences(x_train, x_eval, model_path):
     model = Word2Vec.load(model_path)
 
     # Create BPE tokens
-    token_train = bpe(x_train, vocab_size)
-    token_eval = bpe(x_eval, vocab_size)
+    if tokenization == 'w2v-bpe':
+        token_train = bpe(x_train, vocab_size)
+        token_eval = bpe(x_eval, vocab_size)
+    else:
+        token_train = kmers(x_train, k)
+        token_eval = kmers(x_eval, k) 
+        print('terminei')       
 
     # Apply encoding to train and eval
     encoded_train = apply_w2v(model, token_train, vector_length)

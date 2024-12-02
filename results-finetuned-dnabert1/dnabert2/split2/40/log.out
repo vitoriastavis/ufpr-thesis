@@ -4,17 +4,17 @@ Embedding: dnabert2
 Embedding arguments: {'pooling': 'max', 'model_type': 'finetuned-cancer'}
 
 > model loaded
-Learning rate: 0.003
+Learning rate: 0.0003
 Number of epochs: 100
 Hidden size: 768
 
 > training complete
 Epoch 0/100, loss = 0.0
-Epoch 100/100, loss = 0.68
+Epoch 100/100, loss = 0.626
 
 > evaluation complete
-Accuracy: 0.6638884045335658
-Precision: 0.665448509311855
-Recall: 0.6638900970289989
-F1-score: 0.66
-Matthew's correlation: 0.3293349191593454
+Accuracy: 0.6759895379250218
+Precision: 0.6826445827232797
+Recall: 0.6759862088824096
+F1-score: 0.67
+Matthew's correlation: 0.35856897627307144

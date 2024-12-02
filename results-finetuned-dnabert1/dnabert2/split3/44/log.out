@@ -10,11 +10,11 @@ Hidden size: 768
 
 > training complete
 Epoch 0/100, loss = 0.0
-Epoch 100/100, loss = 0.68
+Epoch 100/100, loss = 0.678
 
 > evaluation complete
-Accuracy: 0.6638884045335658
-Precision: 0.665448509311855
-Recall: 0.6638900970289989
-F1-score: 0.66
-Matthew's correlation: 0.3293349191593454
+Accuracy: 0.6083347863993025
+Precision: 0.650095882662361
+Recall: 0.6083255880533813
+F1-score: 0.58
+Matthew's correlation: 0.255023330335023
