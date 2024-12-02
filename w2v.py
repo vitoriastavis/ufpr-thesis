@@ -4,9 +4,11 @@ import re
 from gensim.models import Word2Vec
 import pandas as pd
 import numpy as np
+import os
 from transformers import AutoTokenizer
 from collections import defaultdict
 import argparse
+import time
 
 # Aplica o word2vec nas sequencias 
 def apply_w2v(model, token_encode, vector_length):  
@@ -27,24 +29,6 @@ def apply_w2v(model, token_encode, vector_length):
     encoded_sequences = np.array(encoded_sequences)
                 
     return encoded_sequences
-
-
-def train_w2v(train_path, vocab_size, window_size, num_epochs, vector_length, save_path):
-    df_w2v = pd.read_csv(train_path)    
-    x_w2v = df_w2v.iloc[:, 0]
-    
-    # Create BPE tokens
-    token_w2v = bpe(x_w2v, vocab_size)
-
-    min_count = 1
-
-    # Train w2v
-    model = Word2Vec(token_w2v, vector_size=vector_length,
-                    window=window_size, min_count=min_count, sg=1)
-                    
-    model.train(token_w2v, total_examples=len(token_w2v), epochs=num_epochs)
-
-    model.save(save_path)
 
 def tokenize(text, tokenizer, merges):
     pre_tokenize_result = tokenizer._tokenizer.pre_tokenizer.pre_tokenize_str(text)
@@ -167,7 +151,7 @@ def process_sequences(x_train, x_eval, model_path, tokenization, k=3):
     else:
         token_train = kmers(x_train, k)
         token_eval = kmers(x_eval, k) 
-        print('terminei')       
+        # print('terminei')       
 
     # Apply encoding to train and eval
     encoded_train = apply_w2v(model, token_train, vector_length)
@@ -175,27 +159,66 @@ def process_sequences(x_train, x_eval, model_path, tokenization, k=3):
 
     return encoded_train, encoded_eval
 
+def train_w2v(train_path, output_path, window_size, tokenization, embedding_arg):
+    
+    start_time = time.time()    
+    num_epochs = 250
+    vector_length = 768
+    min_count = 1
+
+    df_w2v = pd.read_csv(train_path)    
+    x_w2v = df_w2v.iloc[:, 0]
+    
+    # Create tokens
+    if tokenization == 'bpe':      
+        # embedding_arg = vocab_size 
+        token_w2v = bpe(x_w2v, embedding_arg)
+    else:
+        # embedding_arg = k
+        token_w2v = kmers(x_w2v, embedding_arg)
+
+    # Train w2v
+    model = Word2Vec(token_w2v, vector_size=vector_length,
+                    window=window_size, min_count=min_count, sg=1)
+                    
+    model.train(token_w2v, total_examples=len(token_w2v), epochs=num_epochs)
+
+    os.makedirs(output_path, exist_ok = True)
+    output_path = f'{output_path}/{tokenization}-{embedding_arg}-{window_size}'
+    
+    model.save(output_path)
+
+    total_time = time.time() - start_time
+
+    with open(f'{output_path}-log.out', 'w') as f:
+        f.write(f'Execution time = {round(total_time, 3)}\n')
+
 def main():
     # Argument parsing 
-    parser = argparse.ArgumentParser(description="trains or applies w2v")    
-    parser.add_argument('-tp', '--train_path', type=str, help='Path with text to train w2v')    
-    parser.add_argument('-vs', '--vocab_size', type=int, help='Size of vocabulary') 
-    parser.add_argument('-ws', '--window_size', type=int, help='Sliding window size') 
-    parser.add_argument('-ne', '--num_epochs', type=int, help='Number of epochs') 
-    parser.add_argument('-vl', '--vector_length', type=int, help='Length of the vector to represent each word') 
-    parser.add_argument('-op', '--save_path', type=str, help='Path with text to train w2v')    
-
+    parser = argparse.ArgumentParser(description="Trains w2v")  
+    parser.add_argument('-tp', '--train_path', type=str, help='Path with text to train w2v')
+    parser.add_argument('-op', '--output_path', type=str, help='Path to save the models')    
+ 
     args = parser.parse_args()   
-
+    output_path = args.output_path
     train_path = args.train_path
-    vocab_size = args.vocab_size
-    window_size = args.window_size
-    num_epochs = args.num_epochs
-    vector_length = args.vector_length
-    save_path = args.save_path
 
-    train_w2v(train_path, vocab_size, window_size, num_epochs, vector_length, save_path)
+    tokenization_methods = ['bpe', 'kmer']
+    vocab_sizes = [100, 200]
+    kmers = [3,6]
+    window_sizes = [5, 10]
 
+    for tokenization in tokenization_methods:
+
+        if tokenization == 'bpe':
+            for vocab_size in vocab_sizes:
+                for window_size in window_sizes:
+                    train_w2v(train_path, output_path, window_size, tokenization, vocab_size)
+        else:
+            for k in kmers:
+                for window_size in window_sizes:
+                    train_w2v(train_path, output_path, window_size, tokenization, k)
+        
 if __name__ == "__main__":
     main()
 
