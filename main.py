@@ -8,6 +8,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import argparse
 from sklearn.model_selection import train_test_split
+import time
 
 import dataset
 import onehot
@@ -107,8 +108,7 @@ def prepare_datasets(split, embedding, embedding_args):
     # Apply word2vec to x_train and x_eval 
     elif embedding == 'w2v-bpe' or embedding == 'w2v-kmer':     
         encoded_train, encoded_eval = w2v.process_sequences(x_train, x_eval,
-                                                            embedding_args['model_path'],
-                                                            embedding_args['tokenization']) 
+                                                            embedding_args) 
     # Apply grover to x_train and x_eval                                      
     elif embedding == 'grover-pretrained' or embedding == 'grover-finetuned-cancer':
         encoded_train, encoded_eval = grover.process_sequences(x_train, x_eval,
@@ -135,7 +135,7 @@ def prepare_datasets(split, embedding, embedding_args):
 
     return dataloader_train, dataloader_eval
 
-def train(model, dataloader, num_epochs, optimizer, loss_function):
+def train(model, dataloader, num_epochs, optimizer):
     """
     Performs the model training with train dataloader.
 
@@ -318,23 +318,33 @@ def run(embedding, split, output_path, learning_rate, num_epochs, count, embeddi
     # Classifier parameters
     n_labels = 2     
     dropout_prob = 0.1  
-    hidden_size = 250
+    hidden_size = 768
 
     os.makedirs(output_path, exist_ok = True)
 
     with open(f'{output_path}/{count}.out', "w") as file:
 
         # Create dataloaders from inputs
+        start_time = time.time()
         dataloader_train, dataloader_eval = prepare_datasets(split, embedding, embedding_args)
+        total_time = time.time()-start_time
 
         file.write('> datasets loaded\n')
-        file.write(f'Embedding: {embedding}\n\n')
+        file.write(f'Embedding {embedding} took {round(total_time, 3)}s\n')
+        file.write('Embedding args:\n')
+
+        if embedding != 'onehot':
+            for k, v in embedding_args.items():
+                if k != 'tokenization':
+                    file.write(f'{k}: {v}; ')
+        else:
+            file.write('\n')    
 
         # Initialize the model, optimizer, and loss function
         model = Classifier(hidden_size, n_labels, dropout_prob, embedding)
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)  
 
-        file.write('> model loaded\n')
+        file.write('\n\n> model loaded\n')
         file.write(f"Learning rate: {learning_rate}\n")
         file.write(f"Number of epochs: {num_epochs}\n")
         file.write(f"Hidden size: {hidden_size}\n\n")
@@ -393,25 +403,25 @@ def main():
     #                   'dnabert2-pretrained', 'dnabert2-finetuned-cancer',
     #                   'grover-pretrained'
     #                   'grover-finetuned-cancer']
-    # learning_rates = [0.003, 0.0003] 
-    # num_epochs = [20, 100]          
-    # pooling_methods =  ['mean', 'max']
+    learning_rates = [0.003, 0.0003] 
+    num_epochs = [20, 100]          
+    pooling_methods =  ['mean', 'max']
 
-    all_embeddings = ['w2v-kmer']
+    all_embeddings = ['w2v-kmer', 'w2v-bpe']
 
     # Classifier parameters
-    learning_rates = [0.003] 
-    num_epochs = [20, 10]    
-
+  
     # Embedding arguments
     pooling_methods =  ['mean']
-    w2v_path = './w2v-models'
-    w2v_models = [os.path.join(w2v_path, f) for f in os.listdir(w2v_path) if os.path.isfile(os.path.join(w2v_path, f)) and f.endswith('_model')]
-    
+    vocab_sizes = [100, 200]
+    kmers = [3, 6]
+    window_sizes = [5, 10]
+
     # Create splits
     n_splits = 3
     splits = create_splits(file_path, n_splits)
 
+    # Starts with hidden_size = 404 for one-hot encoding
     for embedding in all_embeddings:
 
         # Begins each embedding in model #1
@@ -421,33 +431,36 @@ def main():
 
             # Get split
             split = splits[i]
+            output_path = f'{results_path}/{embedding}/split{i+1}'
 
             for learning_rate in learning_rates:
                 for epochs in num_epochs:
                     
-                    if embedding == 'onehot':  
-                        output_path = f'{results_path}/{embedding}/split{i+1}/{count}.out'
-                        hidden_size = 404                   
-                        run(embedding, split, output_path, learning_rate, hidden_size, epochs, {})
-                        print(f'Done {embedding} {count}')                   
-                        count += 1
+                    # if embedding == 'onehot':                                          
+                    #     run(embedding, split, output_path, learning_rate, hidden_size, epochs, {})
+                    #     print(f'Done {embedding} {count}')                   
+                    #     count += 1
 
-                    elif embedding == 'w2v-bpe' or embedding == 'w2v-kmer':  
-                        hidden_size = 250                     
-                        for model_path in w2v_models:
-                            output_path = f'{results_path}/{embedding}/split{i+1}'
-                            print
-                            embedding_args = {'model_path': model_path, 'tokenization': embedding}
-                            run(embedding, split, output_path, learning_rate, epochs, count, embedding_args)
-                            print(f'Done {embedding} {count}')
-                            count += 1
+                    if embedding == 'w2v-bpe':  
+                        for vocab_size in vocab_sizes:
+                            for window_size in window_sizes:
+                                embedding_args = {'vocab_size': vocab_size, 'window_size': window_size, 'tokenization': embedding}
+                                run(embedding, split, output_path, learning_rate, epochs, count, embedding_args)
+                                print(f'Done {embedding} {count}')
+                                count += 1
+
+                    elif embedding == 'w2v-kmer':  
+                        for k in kmers:
+                            for window_size in window_sizes:
+                                embedding_args = {'k': k, 'window_size': window_size, 'tokenization': embedding}
+                                run(embedding, split, output_path, learning_rate, epochs, count, embedding_args)
+                                print(f'Done {embedding} {count}')
+                                count += 1
 
                     else:
-                        hidden_size = 768
                         for pooling in pooling_methods:
-                            output_path = f'{results_path}/{embedding}/split{i+1}/{count}.out'
                             embedding_args = {'pooling': pooling, 'model_type': embedding}   
-                            run(embedding, split, output_path, learning_rate, hidden_size, epochs, embedding_args)
+                            run(embedding, split, output_path, learning_rate, epochs, count, embedding_args)
                             print(f'Done {embedding} {count}')
                             count += 1                        
 

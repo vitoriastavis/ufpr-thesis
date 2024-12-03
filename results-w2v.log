@@ -1,0 +1,28 @@
+nohup: ignoring input
+<class 'numpy.ndarray'>
+/home/stavisa/.local/lib/python3.10/site-packages/torch/autograd/graph.py:825: UserWarning: CUDA initialization: The NVIDIA driver on your system is too old (found version 11040). Please update your GPU driver by downloading and installing a new version from the URL: http://www.nvidia.com/Download/index.aspx Alternatively, go to: https://pytorch.org to install a PyTorch version that has been compiled with your version of the CUDA driver. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+Done w2v-kmer 1
+<class 'numpy.ndarray'>
+Done w2v-kmer 2
+<class 'numpy.ndarray'>
+Done w2v-kmer 3
+<class 'numpy.ndarray'>
+Done w2v-kmer 4
+<class 'numpy.ndarray'>
+Done w2v-kmer 5
+<class 'numpy.ndarray'>
+Done w2v-kmer 6
+<class 'numpy.ndarray'>
+Done w2v-kmer 7
+<class 'numpy.ndarray'>
+Done w2v-kmer 8
+<class 'numpy.ndarray'>
+Done w2v-kmer 9
+<class 'numpy.ndarray'>
+Done w2v-kmer 10
+<class 'numpy.ndarray'>
+Done w2v-kmer 11
+<class 'numpy.ndarray'>
+Done w2v-kmer 12
+<class 'numpy.ndarray'>
