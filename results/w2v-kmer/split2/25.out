@@ -1,0 +1,20 @@
+> datasets loaded
+Embedding w2v-kmer took 47.167s
+Embedding args:
+k: 3; window_size: 5; 
+
+> model loaded
+Learning rate: 0.0003
+Number of epochs: 20
+Hidden size: 768
+
+> training complete
+Epoch 0/20, loss = 0.0
+Epoch 20/20, loss = 0.617
+
+> evaluation complete
+Accuracy: 0.6650392327811683
+Precision: 0.665284892037878
+Recall: 0.6650385598335536
+F1-score: 0.66
+Matthew's correlation: 0.33032336002272555

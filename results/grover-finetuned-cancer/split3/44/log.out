@@ -1,0 +1,20 @@
+> datasets loaded
+Embedding: grover
+
+Embedding arguments: {'pooling': 'max', 'model_type': 'finetuned-cancer'}
+
+> model loaded
+Learning rate: 0.003
+Number of epochs: 100
+Hidden size: 768
+
+> training complete
+Epoch 0/100, loss = 0.0
+Epoch 100/100, loss = 0.796
+
+> evaluation complete
+Accuracy: 0.5599302528334786
+Precision: 0.6521704907627206
+Recall: 0.5599166762281701
+F1-score: 0.48
+Matthew's correlation: 0.19097172593357045

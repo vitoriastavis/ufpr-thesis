@@ -318,7 +318,11 @@ def run(embedding, split, output_path, learning_rate, num_epochs, count, embeddi
     # Classifier parameters
     n_labels = 2     
     dropout_prob = 0.1  
-    hidden_size = 768
+    
+    if embedding == 'onehot':
+        hidden_size = 404
+    else:
+        hidden_size = 768
 
     os.makedirs(output_path, exist_ok = True)
 
@@ -407,7 +411,7 @@ def main():
     num_epochs = [20, 100]          
     pooling_methods =  ['mean', 'max']
 
-    all_embeddings = ['w2v-kmer', 'w2v-bpe']
+    all_embeddings = ['onehot']
 
     # Classifier parameters
   
@@ -436,10 +440,10 @@ def main():
             for learning_rate in learning_rates:
                 for epochs in num_epochs:
                     
-                    # if embedding == 'onehot':                                          
-                    #     run(embedding, split, output_path, learning_rate, hidden_size, epochs, {})
-                    #     print(f'Done {embedding} {count}')                   
-                    #     count += 1
+                    if embedding == 'onehot':                                          
+                        run(embedding, split, output_path, learning_rate, epochs, count, {})
+                        print(f'Done {embedding} {count}')                   
+                        count += 1
 
                     if embedding == 'w2v-bpe':  
                         for vocab_size in vocab_sizes:

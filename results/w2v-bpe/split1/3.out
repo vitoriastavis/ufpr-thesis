@@ -1,0 +1,20 @@
+> datasets loaded
+Embedding w2v-bpe took 1004.014s
+Embedding args:
+vocab_size: 200; window_size: 5; 
+
+> model loaded
+Learning rate: 0.003
+Number of epochs: 20
+Hidden size: 768
+
+> training complete
+Epoch 0/20, loss = 0.0
+Epoch 20/20, loss = 0.689
+
+> evaluation complete
+Accuracy: 0.5735658238884045
+Precision: 0.573637977707895
+Recall: 0.5735652760947245
+F1-score: 0.57
+Matthew's correlation: 0.14720323584946715
