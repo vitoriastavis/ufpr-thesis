@@ -202,7 +202,6 @@ def process_sequences(x_train, x_eval, embedding_args):
     # Apply encoding to train and eval
     encoded_train = apply_w2v(model, token_train, vector_length)
     encoded_eval = apply_w2v(model, token_eval, vector_length)
-    print(type(encoded_train))
 
     return encoded_train, encoded_eval
 

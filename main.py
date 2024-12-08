@@ -101,6 +101,8 @@ def prepare_datasets(split, embedding, embedding_args):
     x_eval = df_eval['sequence']
     y_eval = df_eval['label']
 
+    print(embedding)
+
     # Apply one-hot encoding to x_train and x_eval 
     if embedding == 'onehot':
         encoded_train, encoded_eval = onehot.process_sequences(x_train, x_eval)
@@ -337,37 +339,37 @@ def run(embedding, split, output_path, learning_rate, num_epochs, count, embeddi
         file.write(f'Embedding {embedding} took {round(total_time, 3)}s\n')
         file.write('Embedding args:\n')
 
-        if embedding != 'onehot':
-            for k, v in embedding_args.items():
-                if k != 'tokenization':
-                    file.write(f'{k}: {v}; ')
-        else:
-            file.write('\n')    
+        # if embedding != 'onehot':
+        #     for k, v in embedding_args.items():
+        #         if k != 'tokenization':
+        #             file.write(f'{k}: {v}; ')
+        # else:
+        #     file.write('\n')    
 
-        # Initialize the model, optimizer, and loss function
-        model = Classifier(hidden_size, n_labels, dropout_prob, embedding)
-        optimizer = optim.Adam(model.parameters(), lr=learning_rate)  
+        # # Initialize the model, optimizer, and loss function
+        # model = Classifier(hidden_size, n_labels, dropout_prob, embedding)
+        # optimizer = optim.Adam(model.parameters(), lr=learning_rate)  
 
-        file.write('\n\n> model loaded\n')
-        file.write(f"Learning rate: {learning_rate}\n")
-        file.write(f"Number of epochs: {num_epochs}\n")
-        file.write(f"Hidden size: {hidden_size}\n\n")
+        # file.write('\n\n> model loaded\n')
+        # file.write(f"Learning rate: {learning_rate}\n")
+        # file.write(f"Number of epochs: {num_epochs}\n")
+        # file.write(f"Hidden size: {hidden_size}\n\n")
 
-        # Train the classifier
-        model, first_loss, last_loss = train(model, dataloader_train, num_epochs, optimizer)
-        file.write('> training complete\n')
-        file.write(f"Epoch 0/{num_epochs}, loss = {round(first_loss, 3)}\n")
-        file.write(f"Epoch {num_epochs}/{num_epochs}, loss = {round(last_loss, 3)}\n\n")
+        # # Train the classifier
+        # model, first_loss, last_loss = train(model, dataloader_train, num_epochs, optimizer)
+        # file.write('> training complete\n')
+        # file.write(f"Epoch 0/{num_epochs}, loss = {round(first_loss, 3)}\n")
+        # file.write(f"Epoch {num_epochs}/{num_epochs}, loss = {round(last_loss, 3)}\n\n")
 
-        # Evaluation
-        metrics = eval(model, dataloader_eval)
+        # # Evaluation
+        # metrics = eval(model, dataloader_eval)
 
-        file.write('> evaluation complete\n')
-        file.write(f"Accuracy: {metrics['accuracy']}\n")
-        file.write(f"Precision: {metrics['precision']}\n")
-        file.write(f"Recall: {metrics['recall']}\n")
-        file.write(f"F1-score: {round(metrics['f1'],2)}\n")
-        file.write(f"Matthew's correlation: {metrics['matthews']}\n")   
+        # file.write('> evaluation complete\n')
+        # file.write(f"Accuracy: {round(metrics['accuracy'], 3)}\n")
+        # file.write(f"Precision: {round(metrics['precision'], 3)}\n")
+        # file.write(f"Recall: {round(metrics['recall'], 3)}\n")
+        # file.write(f"F1-score: {round(metrics['f1'], 3)}\n")
+        # file.write(f"Matthew's correlation: {round(metrics['matthews'], 3)}\n")   
 
 def parse_arguments():
     """
@@ -401,31 +403,26 @@ def main():
     """
     file_path, results_path = parse_arguments()
 
-    # all_embeddings = ['onehot', 'w2v', 'grover', 'dnabert1', 'dnabert2']
-    # all_embeddings = ['w2v-bpe', 'w2v-kmer',
-    #                   'dnabert1-pretrained', 'dnabert1-finetuned-motifs',
-    #                   'dnabert2-pretrained', 'dnabert2-finetuned-cancer',
-    #                   'grover-pretrained'
-    #                   'grover-finetuned-cancer']
-    learning_rates = [0.003, 0.0003] 
-    num_epochs = [20, 100]          
-    pooling_methods =  ['mean', 'max']
-
-    all_embeddings = ['onehot']
+    all_embeddings = ['w2v-bpe', 'w2v-kmer',
+                      'dnabert1-pretrained', 'dnabert1-finetuned-motifs',
+                      'dnabert2-pretrained', 'dnabert2-finetuned-cancer',
+                      'grover-pretrained', 'grover-finetuned-cancer']
 
     # Classifier parameters
-  
-    # Embedding arguments
+    learning_rates = [0.003, 0.0003] 
+    num_epochs = [20, 100]             
+
+    # Embedding parameters
+    # pooling_methods =  ['mean', 'max']
     pooling_methods =  ['mean']
     vocab_sizes = [100, 200]
     kmers = [3, 6]
     window_sizes = [5, 10]
 
     # Create splits
-    n_splits = 3
+    n_splits = 1
     splits = create_splits(file_path, n_splits)
 
-    # Starts with hidden_size = 404 for one-hot encoding
     for embedding in all_embeddings:
 
         # Begins each embedding in model #1

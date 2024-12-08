@@ -29,12 +29,12 @@ def process_sequences(x_train, x_eval, pooling, model_type):
     
     # model_path = '/home/stavisa/models/dnabert1/finetuned-model'
 
-    if model_type == 'pretrained':
+    if model_type == 'dnabert1-pretrained':
        model_path = 'zhihan1996/DNA_bert_6'
-    elif model_type == 'finetuned-motifs':
+    elif model_type == 'dnabert1-finetuned-motifs':
        model_path = '/home/stavisa/models/dnabert1/finetuned-model'
     else:
-       raise TypeError(f"model_type must be 'pretrained' or 'finetuned-prediction'")
+       raise TypeError(f"model_type must be 'pretrained' or 'finetuned-motifs'")
 
     # Load tokenizer and model
     tokenizer = AutoTokenizer.from_pretrained(model_path)

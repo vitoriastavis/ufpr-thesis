@@ -24,9 +24,9 @@ def process_sequences(x_train, x_eval, pooling, model_type):
     if pooling != 'mean' and pooling != 'max':
         raise TypeError(f"pooling must be 'mean' or 'max'")
 
-    if model_type == 'pretrained':
+    if model_type == 'dnabert2-pretrained':
        model_path = 'zhihan1996/DNABERT-2-117M'
-    elif model_type == 'finetuned-cancer':
+    elif model_type == 'dnabert2-finetuned-cancer':
        model_path = 'UKaizokuO/DNABERT-2-117M-finetuned-cancer'
     else:
        raise TypeError(f"model_type must be 'pretrained' or 'finetuned-cancer'")

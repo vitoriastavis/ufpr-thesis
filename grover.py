@@ -23,9 +23,9 @@ def process_sequences(x_train, x_eval, pooling, model_type):
     if pooling != 'mean' and pooling != 'max':
         raise TypeError(f"pooling must be 'mean' or 'max'")
     
-    if model_type == 'pretrained':
+    if model_type == 'grover-pretrained':
        model_path = 'PoetschLab/GROVER'
-    elif model_type == 'finetuned-cancer':
+    elif model_type == 'grover-finetuned-cancer':
        model_path = 'UKaizokuO/GROVER-finetuned-cancer'
     else:
        raise TypeError(f"model_type must be 'pretrained' or 'finetuned-cancer'")
@@ -33,6 +33,7 @@ def process_sequences(x_train, x_eval, pooling, model_type):
     # Load tokenizer and model
     tokenizer = AutoTokenizer.from_pretrained(model_path,trust_remote_code=True)
     config = BertConfig.from_pretrained(model_path)
+    config.alibi_starting_size = 0
     model = AutoModel.from_pretrained(model_path,trust_remote_code=True, config=config)
     
     # Apply encoding to train and eval
